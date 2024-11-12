@@ -13,16 +13,17 @@ import Avatar from '@mui/material/Avatar';
 import AvatarGroup from '@mui/material/AvatarGroup';
 
 interface EventProps {
+    id: number,
+    club: string,
     title: string,
     date: string,
     room: string, 
+    favorite: boolean,
+    incentives: string[],
+    toggleFavorite: (id: number) => void,
 }
 
 export default function EventCard(event: EventProps) {
-  const [interested, setInterested] = React.useState(false);
-  const handleClick = () => {
-    setInterested(!interested);
-  };
   return (
     <Card sx={{ maxWidth: 345, borderRadius: 2 }}>
       <CardMedia
@@ -32,13 +33,13 @@ export default function EventCard(event: EventProps) {
       />
       <CardContent>
         <Typography gutterBottom variant="h6" component="div">
-         <b>Software Engineering 101</b>
+         <b>{event.title}</b>
         </Typography>
         <Typography gutterBottom variant="body2">
-          Nov 27, 6:00 - 7:30 PM
+            {event.date}
         </Typography>
         <Typography variant="body2">
-          CSE1202
+           {event.room}
         </Typography>
       </CardContent>
       <CardActions>
@@ -52,10 +53,12 @@ export default function EventCard(event: EventProps) {
             </AvatarGroup>
         </Box>
         <Box sx={{ display: 'flex', justifyContent:'flex-end', alignItems:'center', gap: '0.25rem' }}>
-            <Chip label="CSES" color="secondary" size="small" />
-            <Chip label="Food" color="primary" size="small" />
-            <IconButton aria-label="add to favorites" onClick={handleClick}>
-            <FavoriteIcon sx={{color: interested ? pink[500] : "action"}}/>
+            <Chip label={event.club} color="secondary" size="small" />
+            {event.incentives.map(incentive=>(
+              <Chip label={incentive} color="primary" size="small" />
+            ))}
+            <IconButton aria-label="add to favorites" onClick={() => event.toggleFavorite(event.id)}>
+            <FavoriteIcon sx={{color: event.favorite ? pink[500] : "action"}}/>
             </IconButton>
         </Box>
       </Box>

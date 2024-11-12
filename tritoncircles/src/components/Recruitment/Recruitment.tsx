@@ -7,20 +7,28 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 
-export default function Recruitment() {
+interface RecruitmentProps {
+  id: number,
+  club: string,
+  position: string,
+  date_posted: string,
+  deadline: string,
+}
+
+export default function Recruitment(recruitment: RecruitmentProps) {
   return (
     <Card sx={{ minWidth: 275, minHeight: 275, backgroundColor: '#89cff0'}}>
       <CardContent>
         <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent:'space-between', alignItems:'center', height: '250px' }}>
             <Box sx={{ display: 'flex', justifyContent:'space-between', alignItems:'center', width: '100%' }}>
-                <Chip label="3 Nov 2024" variant="outlined" size="medium" sx={{backgroundColor: 'white'}}/>
-                <Chip label="CSES" color="secondary" size="small" />
+                <Chip label={recruitment.date_posted} variant="outlined" size="medium" sx={{backgroundColor: 'white'}}/>
+                <Chip label={recruitment.club} color="secondary" size="small" />
             </Box>
             <Typography variant="h4">
-                <Box sx={{fontWeight: "bold"}}>Marketing Director</Box>
+                <Box sx={{fontWeight: "bold"}}>{recruitment.position}</Box>
             </Typography>
             <Box sx={{ display: 'flex', justifyContent:'space-between', alignItems:'center', width: '100%' }}>
-                <Typography variant="subtitle2"><b>Deadline: 11 Nov 2024</b></Typography>
+                <Typography variant="subtitle2"><b>{recruitment.deadline}</b></Typography>
                 <Button variant="contained" sx={{backgroundColor: 'black', borderRadius: 2}}>Apply Now</Button>
             </Box>
         </Box>
