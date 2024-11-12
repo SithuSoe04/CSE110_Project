@@ -1,0 +1,49 @@
+.clubs-page {
+    padding: 20px;
+  }
+  
+  .clubs-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .search-bar {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  
+  .section {
+    margin-top: 20px;
+  }
+  
+  h2 {
+    font-size: 1.5em;
+  }
+  
+  .horizontal-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  .club-item, .event-item, .category-item {
+    width: 150px;
+    height: 100px;
+    background-color: #ddd;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1em;
+  }
+  
+  .scroll-arrow {
+    font-size: 1.5em;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
