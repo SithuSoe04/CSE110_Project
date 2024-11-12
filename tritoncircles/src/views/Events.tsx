@@ -98,7 +98,7 @@ const Events = () => {
       </Typography>
       <Grid container spacing={2} mb={5}>
         {favoriteEvents.map((data) => (
-          <Grid size={3}><EventCard id={data.id} club={data.club} title={data.title} date={data.date} room={data.room} favorite={data.favorite} toggleFavorite={toggleFavorite} incentives={data.incentives}/>
+          <Grid data-testid={`favorite-event-${data.id}`} key={data.id} size={3}><EventCard id={data.id} club={data.club} title={data.title} date={data.date} room={data.room} favorite={data.favorite} toggleFavorite={toggleFavorite} incentives={data.incentives}/>
           </Grid>
         ))}
       </Grid>
@@ -107,7 +107,7 @@ const Events = () => {
       </Typography>
       <Grid container spacing={2}>
         {upcomingEvents.map((data) => (
-          <Grid size={3}><EventCard id={data.id} club={data.club} title={data.title} date={data.date} room={data.room} favorite={data.favorite} toggleFavorite={toggleFavorite} incentives={data.incentives}/>
+          <Grid data-testid={`upcoming-event-${data.id}`}key={data.id} size={3}><EventCard id={data.id} club={data.club} title={data.title} date={data.date} room={data.room} favorite={data.favorite} toggleFavorite={toggleFavorite} incentives={data.incentives}/>
           </Grid>
         ))}
       </Grid>
