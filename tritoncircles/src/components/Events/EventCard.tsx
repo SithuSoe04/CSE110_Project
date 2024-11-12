@@ -14,10 +14,12 @@ import AvatarGroup from '@mui/material/AvatarGroup';
 
 interface EventProps {
     id: number,
+    club: string,
     title: string,
     date: string,
     room: string, 
     favorite: boolean,
+    incentives: string[],
     toggleFavorite: (id: number) => void,
 }
 
@@ -51,8 +53,10 @@ export default function EventCard(event: EventProps) {
             </AvatarGroup>
         </Box>
         <Box sx={{ display: 'flex', justifyContent:'flex-end', alignItems:'center', gap: '0.25rem' }}>
-            <Chip label="CSES" color="secondary" size="small" />
-            <Chip label="Food" color="primary" size="small" />
+            <Chip label={event.club} color="secondary" size="small" />
+            {event.incentives.map(incentive=>(
+              <Chip label={incentive} color="primary" size="small" />
+            ))}
             <IconButton aria-label="add to favorites" onClick={() => event.toggleFavorite(event.id)}>
             <FavoriteIcon sx={{color: event.favorite ? pink[500] : "action"}}/>
             </IconButton>
