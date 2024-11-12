@@ -74,7 +74,7 @@ export default function NavBar(props: Props) {
             sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' }}}
           >
             <Link to='/' style={{ textDecoration: 'none', color: 'inherit' }}>
-                Triton Circles
+                <Box sx={{ fontWeight: "bold" }}>TritonCircles</Box>
             </Link>
           </Typography>
           <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
