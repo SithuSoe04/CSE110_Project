@@ -52,6 +52,7 @@ const Home = () => {
           position: "Marketing Director",
           date_posted: "3 Nov 2024",
           deadline: "12 Nov 2024",
+          application_link: "https://www.google.com/"
       },
       {
           id: 2,
@@ -59,6 +60,7 @@ const Home = () => {
           position: "Marketing Director",
           date_posted: "3 Nov 2024",
           deadline: "12 Nov 2024",
+          application_link: "https://www.google.com/"
       },
       {
           id: 3,
@@ -66,6 +68,7 @@ const Home = () => {
           position: "Marketing Director",
           date_posted: "3 Nov 2024",
           deadline: "12 Nov 2024",
+          application_link: "https://www.google.com/"
       },
       {
           id: 4,
@@ -73,6 +76,7 @@ const Home = () => {
           position: "Marketing Director",
           date_posted: "3 Nov 2024",
           deadline: "12 Nov 2024",
+          application_link: "https://www.google.com/"
       }]
     return (
       <Box sx={{ flexGrow: 1, margin: "3rem" }}>
@@ -90,7 +94,7 @@ const Home = () => {
         </Typography>
         <Grid container spacing={2} mb={5}>
           {recruitmentData.map(data => 
-             <Grid size={3}><Recruitment id={data.id} club={data.club} position={data.position} date_posted={data.date_posted} deadline={data.deadline} /></Grid>
+             <Grid size={3}><Recruitment id={data.id} club={data.club} position={data.position} date_posted={data.date_posted} deadline={data.deadline} application_link={data.application_link}/></Grid>
           )}
         </Grid> 
         <Typography gutterBottom variant="h4">

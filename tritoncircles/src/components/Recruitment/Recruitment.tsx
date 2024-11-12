@@ -13,6 +13,7 @@ interface RecruitmentProps {
   position: string,
   date_posted: string,
   deadline: string,
+  application_link: string,
 }
 
 export default function Recruitment(recruitment: RecruitmentProps) {
@@ -29,7 +30,7 @@ export default function Recruitment(recruitment: RecruitmentProps) {
             </Typography>
             <Box sx={{ display: 'flex', justifyContent:'space-between', alignItems:'center', width: '100%' }}>
                 <Typography variant="subtitle2"><b>{recruitment.deadline}</b></Typography>
-                <Button variant="contained" sx={{backgroundColor: 'black', borderRadius: 2}}>Apply Now</Button>
+                <Button variant="contained" href={recruitment.application_link} sx={{backgroundColor: 'black', borderRadius: 2}}>Apply Now</Button>
             </Box>
         </Box>
       </CardContent>

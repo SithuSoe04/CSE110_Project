@@ -31,7 +31,7 @@ export default function NavBar(props: Props) {
   };
 
   const drawer = (
-    <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
+    <Box data-testid="navbar" onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
       <Typography variant="h6" sx={{ my: 2 }}>
         <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
             TritonCircles
