@@ -1,0 +1,288 @@
+.profile-container{
+    width: 100%;
+    /* max-width: 600px; */
+    padding: 3rem;
+    font-family: Arial, sans-serif;
+    margin: auto;
+}
+
+.profile-header{
+    display: flex;
+    align-items: center;
+    padding-bottom: 0.5rem;
+    width: 50%;
+    height: auto;
+}
+
+.profile-avatar{
+    border-radius: 50%;
+    position: relative;
+    display: inline-block;
+    padding-right: 0;
+    margin-right: 0;
+}
+
+.profile-info{
+    margin-left: -55%;
+}
+
+.profile-avatar img{
+    width: 40%;
+    height: 40%;
+    object-fit: cover;
+    border-radius: 20%;
+}
+
+.upload-image{
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    left:0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    transform: translateX(-60%);
+}
+
+.profile-info h2{
+    font-size: 3rem;
+    margin: 0; 
+}
+
+.profile-info p{
+    font-size: 1rem;
+    color: rgb(106, 106, 106);
+    align-items: center;
+    display: flex;
+}
+
+.profile-info img{
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+}
+
+.profile-details{
+    display: flex; 
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 0.5rem;
+    width: 100%;
+}
+
+.profile-details h3{
+    margin-right: 60px;
+    font-size: 25px;
+    align-items: center;
+}
+
+.profile-detail{
+    margin-right: 100px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.profile-detail:last-child{
+    margin-right: 0px;
+}
+
+.profile-detail img{
+    width: 70px;
+    height: 70px;
+    cursor: pointer;
+}
+
+.profile-section{
+    margin-top: 1.5rem; 
+    background-color: rgb(235, 235, 235);
+    border-radius: 20px;
+    padding: 3px 1rem;
+    padding-bottom: 2rem;
+}
+
+.profile-section h3{
+    font-size: 1.7rem;
+    margin-bottom: 0.5rem;
+    padding: 0;
+}
+
+.interests-container{
+    display: flex;
+    gap: 0.5rem; 
+    flex-wrap: wrap;
+    margin: auto;
+}
+
+.interest-tag{
+    background-color: rgb(206, 206, 206);
+    padding: 0.4rem 0.8rem;
+    border-radius: 1rem; 
+    width: auto;
+    font-size: 1.2rem;
+    display: inline-block;
+    align-items: center;
+}
+
+.remove-tag{
+    margin-left: 8px;
+    color: rgb(170, 8, 8);
+    cursor: pointer;
+    display: none;
+}
+
+.interest-tag:hover .remove-tag{
+    display: inline;
+}
+
+.add-interest{
+    background-color: rgb(206, 206, 206);
+    border: none;
+    border-radius: 1rem;
+    font-size: 1.2rem;
+    padding: 0.3rem 0.6rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.clubs-container{
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding: 1.5rem 1rem;
+}
+
+.club-card{
+    background-color: rgb(206,206,206);
+    border-radius: 8px;
+    padding: 1rem;
+    min-width: 60px;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    cursor: pointer;
+    margin-right: 20px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.club-icon {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background-color: rgb(13, 33, 53);
+
+}
+
+.club-icon1 {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background-color: rgb(9, 62, 34);
+
+}
+
+.club-icon2 {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background-color: rgb(170, 63, 36);
+
+}
+
+.club-icon3 {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background-color: rgb(117, 29, 29);
+
+}
+
+.club-icon4 {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background-color: rgb(189, 189, 25);
+
+}
+
+.club-icon5 {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background-color: rgb(11, 64, 76);
+
+}
+
+.club-icon6 {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background-color: rgb(62, 18, 86);
+
+}
+
+.club-card p{
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+
+.bio-input{
+    font-size: 1rem;
+    padding: 8px; 
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+    width: 200px;
+    flex: 1;
+}
+
+.bio-section{
+    display: flex;
+    align-items: center;
+}
+
+.bio-text{
+    margin-right: 10px;
+}
+
+.upload-label img{
+    width: 50px;
+    height: 50px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    position: absolute;
+    transform: translate(-172px, 124px);
+}
+
+.upload-label:hover img{
+    opacity: 0.8;
+}
+
+.icon_edit{
+    cursor: pointer;
+    z-index: 10;
+    opacity: 1;
+}
+
+.bio-input{
+    padding: 8px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    width: 100%;
+    z-index: 2;
+}
+
+.icon_save{
+    cursor: pointer;
+    z-index: 10;
+    position: relative;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
