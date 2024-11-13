@@ -5,6 +5,7 @@ import { Route, Routes } from 'react-router-dom';
 import Clubs from './views/Clubs';
 import Events from './views/Events';
 import Friends from './views/Friends';
+import FriendsInterestedEvents from './views/FriendsInterestedEvents';
 import Home from './views/Home';
 import Profile from './views/Profile';
 import Calendar from './views/Calendar';
@@ -19,6 +20,7 @@ function App() {
        <Route path="clubs" element={<Clubs />} />
        <Route path="calendar" element={<Calendar/>} />
        <Route path="friends" element={<Friends />} />
+       <Route path="friends-interested-events" element={<FriendsInterestedEvents />} />
        <Route path="profile" element={<Profile />} />
      </Routes>
     </div>
