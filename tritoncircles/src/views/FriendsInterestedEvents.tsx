@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, IconButton, Avatar, Button, List, ListItem, Divider } from '@mui/material';
+import { Box, Typography, IconButton, Avatar, Button, List, ListItem, Divider, TextField } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
 interface Event {
@@ -18,18 +18,38 @@ const FriendsInterestedEvents: React.FC = () => {
     { id: 3, title: 'Machine Learning Basics', date: 'Mar 15, 2024', time: '1:00 PM - 2:30 PM', courseCode: 'CSE 250' },
   ]);
 
+  const [searchTerm, setSearchTerm] = useState('');
+
   // Function to remove an event by ID
   const removeEvent = (id: number) => {
     setEvents((prevEvents) => prevEvents.filter(event => event.id !== id));
   };
 
+  // Filter events based on the search term
+  const filteredEvents = events.filter(event =>
+    event.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <Box sx={{ padding: '20px' }}>
-      <Typography variant="h4" sx={{ color: 'gray', mb: 2 }}>Friends' Interested Events</Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+        <Typography variant="h4" sx={{ color: 'gray' }}>Friends' Interested Events</Typography>
+        
+        {/* Search bar */}
+        <TextField
+          variant="outlined"
+          placeholder="Search events"
+          size="small"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          sx={{ width: '200px' }}
+        />
+      </Box>
+      
       <Divider sx={{ mb: 2 }} />
 
       <List>
-        {events.map((event) => (
+        {filteredEvents.map((event) => (
           <ListItem key={event.id} sx={{ display: 'flex', alignItems: 'center', mb: 2, padding: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
             <Avatar sx={{ bgcolor: 'green', mr: 2 }}>{event.title.charAt(0)}</Avatar>
             <Box sx={{ flexGrow: 1 }}>
