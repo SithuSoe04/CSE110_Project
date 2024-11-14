@@ -54,9 +54,9 @@ export default function EventCard(event: EventProps) {
         </Box>
         <Box sx={{ display: 'flex', justifyContent:'flex-end', alignItems:'center', gap: '0.25rem' }}>
             <Chip label={event.club} color="secondary" size="small" />
-            {event.incentives.map(incentive=>(
+            {/* {event.incentives.map(incentive=>(
               <Chip label={incentive} color="primary" size="small" />
-            ))}
+            ))} */}
             <IconButton aria-label="add to favorites" onClick={() => event.toggleFavorite(event.id)}>
             <FavoriteIcon sx={{color: event.favorite ? pink[500] : "action"}}/>
             </IconButton>
