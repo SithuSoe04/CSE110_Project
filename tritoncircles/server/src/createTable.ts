@@ -14,8 +14,8 @@ const initDB = async () => {
     name VARCHAR(50) NOT NULL,
     email VARCHAR(50) NOT NULL,
     password VARCHAR(50) NOT NULL,
-    college VARCHAR(50) NOT NULL,
-    major VARCHAR(50) NOT NULL,
+    college VARCHAR(50),
+    major VARCHAR(50),
     interests TEXT
    );
 
@@ -41,7 +41,7 @@ const initDB = async () => {
     FOREIGN KEY(user_id) REFERENCES users(user_id),
     FOREIGN KEY(event_id) REFERENCES events(event_id),
     PRIMARY KEY(user_id, event_id)
-   )
+   );
 
    CREATE TABLE IF NOT EXISTS club_favorites (
     user_id INTEGER,
@@ -49,7 +49,7 @@ const initDB = async () => {
     FOREIGN KEY(user_id) REFERENCES users(user_id),
     FOREIGN KEY(club_id) REFERENCES clubs(club_id),
     PRIMARY KEY(user_id, club_id)
-   )
+   );
  `);
  return db;
 };

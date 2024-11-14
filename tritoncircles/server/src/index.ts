@@ -1,6 +1,7 @@
 import { Response } from "express";
 import { budget } from "./constants";
 import initDB from "./createTable";
+import { createEventEndpoints } from "./events/events-endpoints";
 
 const express = require("express");
 const cors = require("cors");
@@ -25,4 +26,7 @@ app.listen(port, () => {
    res.send({ "data": "Hello, TypeScript Express!" });
    res.status(200);
  });
+
+ createEventEndpoints(app, db);
 })();
+
