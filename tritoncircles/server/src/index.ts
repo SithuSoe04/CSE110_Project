@@ -2,6 +2,7 @@ import { Response } from "express";
 import { budget } from "./constants";
 import initDB from "./createTable";
 import { createEventEndpoints } from "./events/events-endpoints";
+import { createUserEndpoints } from "./users/users-endpoints";
 
 const express = require("express");
 const cors = require("cors");
@@ -28,5 +29,6 @@ app.listen(port, () => {
  });
 
  createEventEndpoints(app, db);
+ createUserEndpoints(app, db);
 })();
 
