@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import initDB from "./createTable";
 import { createEventEndpoints } from "./events/events-endpoints";
+import { createUserEndpoints } from "./users/users-endpoints";
 import { createFriendsEndpoints } from "./friends/friends-endpoints";
 
 const express = require("express");
@@ -28,6 +29,7 @@ app.listen(port, () => {
  });
 
  createEventEndpoints(app, db);
+ createUserEndpoints(app, db);
  createFriendsEndpoints(app, db);
 })();
 
