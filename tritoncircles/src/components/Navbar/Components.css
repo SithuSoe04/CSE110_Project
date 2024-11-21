@@ -1,0 +1,27 @@
+.club-card {
+    padding: 10px;
+    border-radius: 8px;
+    color: white;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.event-card {
+    width: 200px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.event-image {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+}
+
+.event-details {
+    padding: 10px;
+}
