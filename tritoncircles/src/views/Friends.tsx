@@ -1,22 +1,8 @@
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Typography,
-  Button,
-  IconButton,
-  List,
-  ListItem,
-  Avatar,
-  TextField,
-  Divider,
-} from "@mui/material";
+import { Box, Typography, Button, IconButton, List, ListItem, Avatar, TextField, Divider,} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { Link } from "react-router-dom";
-import {
-  fetchFriendRequests,
-  acceptRequest,
-  declineRequest,
-} from "../utils/friends-utils";
+import { fetchFriendRequests, acceptRequest, declineRequest,} from "../utils/friends-utils";
 
 const Friends: React.FC = () => {
   const [showFriendRequests, setShowFriendRequests] = useState(false);
@@ -28,8 +14,13 @@ const Friends: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const friends = await fetchFriendRequests(); 
-        setFriendRequests(friends || []);
+        const cachedRequests = JSON.parse(localStorage.getItem("friend_requests") || "[]");
+        if (cachedRequests.length > 0) {
+          setFriendRequests(cachedRequests);
+        } else {
+          const friends = await fetchFriendRequests();
+          setFriendRequests(friends || []);
+        }
       } catch (err) {
         console.error("Error fetching friend requests:", err);
         setError("Failed to load requests.");
@@ -39,12 +30,15 @@ const Friends: React.FC = () => {
     };
     fetchData();
   }, []);
+  
 
   const handleAccept = async (request: any) => {
     try {
-      await acceptRequest("friend", request.id);
+      await acceptRequest("friend", request.request_id); // Use the correct property (request_id)
       setAcceptedFriends((prev) => [...prev, request]);
-      setFriendRequests((prev) => prev.filter((req) => req.id !== request.id));
+      setFriendRequests((prev) =>
+        prev.filter((req) => req.request_id !== request.request_id) // Filter out the accepted request
+      );
     } catch (err) {
       console.error("Error accepting friend request:", err);
     }
@@ -52,8 +46,14 @@ const Friends: React.FC = () => {
 
   const handleDecline = async (request: any) => {
     try {
-      await declineRequest("friend", request.id);
-      setFriendRequests((prev) => prev.filter((req) => req.id !== request.id));
+      await declineRequest("friend", request.request_id); // Use the correct property (request_id)
+      setFriendRequests((prev) =>
+        prev.map((req) =>
+          req.request_id === request.request_id
+            ? { ...req, declined: true }
+            : req
+        )
+      );
     } catch (err) {
       console.error("Error declining friend request:", err);
     }
@@ -107,36 +107,48 @@ const Friends: React.FC = () => {
             ) : (
               friendRequests.map((request) => (
                 <ListItem
-                  key={request.id}
-                  sx={{ display: "flex", justifyContent: "space-between" }}
+                  key={request.request_id} // Use request_id as the key
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
                 >
                   <Box sx={{ display: "flex", alignItems: "center" }}>
                     <Avatar sx={{ bgcolor: "green", mr: 2 }}>
-                      {request.avatarLetter}
+                      {request.sender_name?.[0]} {/* Show the first letter of sender_name */}
                     </Avatar>
                     <Box>
-                      <Typography variant="body1">{request.name}</Typography>
+                      <Typography variant="body1">{request.sender_name}</Typography> {/* Show sender_name */}
                       <Typography variant="caption">{request.message}</Typography>
                     </Box>
                   </Box>
                   <Box>
-                    <Button
-                      size="small"
-                      variant="contained"
-                      color="primary"
-                      sx={{ mr: 1 }}
-                      onClick={() => handleAccept(request)}
-                    >
-                      Accept
-                    </Button>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      color="error"
-                      onClick={() => handleDecline(request)}
-                    >
-                      Decline
-                    </Button>
+                    {request.declined ? (
+                      <Typography variant="body2" color="error">
+                        Declined
+                      </Typography>
+                    ) : (
+                      <>
+                        <Button
+                          size="small"
+                          variant="contained"
+                          color="primary"
+                          sx={{ mr: 1 }}
+                          onClick={() => handleAccept(request)}
+                        >
+                          Accept
+                        </Button>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="error"
+                          onClick={() => handleDecline(request)}
+                        >
+                          Decline
+                        </Button>
+                      </>
+                    )}
                   </Box>
                 </ListItem>
               ))
@@ -167,13 +179,18 @@ const Friends: React.FC = () => {
 
       {/* Accepted Friends Section */}
       <Divider sx={{ mb: 2 }} />
-      <Typography variant="h6">Accepted Friends</Typography>
+      <Typography variant="h6">My Friends</Typography>
       {acceptedFriends.length > 0 ? (
         <List>
           {acceptedFriends.map((friend) => (
-            <ListItem key={friend.id} sx={{ display: "flex", alignItems: "center" }}>
-              <Avatar sx={{ bgcolor: "green", mr: 2 }}>{friend.avatarLetter}</Avatar>
-              <Typography variant="body1">{friend.name}</Typography>
+            <ListItem
+              key={friend.request_id} // Use request_id as the key
+              sx={{ display: "flex", alignItems: "center" }}
+            >
+              <Avatar sx={{ bgcolor: "green", mr: 2 }}>
+                {friend.sender_name?.[0]} {/* Show the first letter of sender_name */}
+              </Avatar>
+              <Typography variant="body1">{friend.sender_name}</Typography> {/* Show sender_name */}
             </ListItem>
           ))}
         </List>

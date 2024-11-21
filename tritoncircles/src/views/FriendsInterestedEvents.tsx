@@ -8,7 +8,9 @@ interface Event {
   date: string;
   time: string;
   courseCode: string;
+  friendId: number; // New field for friend ID
 }
+
 
 const FriendsInterestedEvents: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
@@ -19,18 +21,19 @@ const FriendsInterestedEvents: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const eventsData = await fetchFriendsInterestedEvents(); 
-        setEvents(eventsData);
+        const eventsData = await fetchFriendsInterestedEvents();
+        setEvents(eventsData || []); // Fallback to an empty array if undefined or null
         setLoading(false);
       } catch (err) {
         console.error("Error fetching events:", err);
-        setError("Failed to load events.");
+        setError("Failed to load friends events.");
         setLoading(false);
       }
     };
-
+  
     fetchData();
   }, []);
+  
 
   // Filter events based on the search term
   const filteredEvents = events.filter((event) =>
@@ -89,10 +92,14 @@ const FriendsInterestedEvents: React.FC = () => {
               <Typography variant="caption" sx={{ display: "block", color: "gray" }}>
                 {event.courseCode}
               </Typography>
+              <Typography variant="caption" sx={{ display: "block", color: "gray" }}>
+                Friend ID: {event.friendId} {/* Display friend_id */}
+              </Typography>
             </Box>
           </ListItem>
         ))}
       </List>
+
     </Box>
   );
 };

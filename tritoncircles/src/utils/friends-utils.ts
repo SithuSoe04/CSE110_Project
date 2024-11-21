@@ -98,25 +98,30 @@ export const declineRequest = async (type: "friend", id: number) => {
 };
 
 export const fetchFriendsInterestedEvents = async () => {
-    const user_id = localStorage.getItem("user_id");
-  
-    if (!user_id) {
-      console.error("User is not logged in.");
-      return [];
-    }
-  
+  const user_id = localStorage.getItem("user_id");
+
+  if (!user_id) {
+    console.error("User is not logged in.");
+    return [];
+  }
+
+  try {
     const response = await fetch(`${API_BASE_URL}/friends/interested-events?user_id=${user_id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
     });
-  
-    const data = await response.json();
-    if (response.ok) {
-      return data.data; 
-    } else {
-      console.error("Error fetching friends' interested events:", data.error);
+
+    if (!response.ok) {
+      console.error("Error fetching friends' interested events:", await response.text());
       return [];
     }
-  };
+
+    const data = await response.json();
+    return data.data || []; // Ensure it always returns an array
+  } catch (err) {
+    console.error("Unexpected error fetching friends' interested events:", err);
+    return [];
+  }
+};
