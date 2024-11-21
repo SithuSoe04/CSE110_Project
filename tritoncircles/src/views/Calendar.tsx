@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import EventCard from "../components/Events/EventCard";
 import {
   Box,
   Typography,
@@ -17,18 +18,71 @@ import {
 } from "@mui/icons-material";
 
 interface Event {
-  id: number;
+  event_id: number;
+  club_id: number;
   title: string;
-  club: string;
-  time: string;
-  date: Date;
-  attending: number;
-  tags: string[];
+  date: string;
+  room: string;
+  incentives?: string;
+  // Adding computed properties for UI
+  club?: string;
+  time?: string;
+  attending?: number;
+  tags?: string[];
+  favorite?: boolean;
 }
 
 const CalendarPage: React.FC = () => {
   const [date, setDate] = useState<Date>(new Date());
   const [clickedDate, setClickedDate] = useState<Date>(new Date());
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("/events", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // if using sessions
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch events");
+      }
+      const data = await response.json();
+
+      // Transform the API data to match our UI needs
+      const transformedEvents = data.data.map((event: Event) => ({
+        ...event,
+        // Convert the date string to a Date object for easier comparison
+        date: new Date(event.date),
+        // Extract time from the date string (might need to adjust this based on date format)
+        time: new Date(event.date).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        // Add default values for UI elements
+        club: `Club ${event.club_id}`,
+        attending: 0,
+        tags: event.incentives ? [event.incentives] : [],
+      }));
+
+      setEvents(transformedEvents);
+      setError(null);
+    } catch (err) {
+      setError("Failed to fetch events");
+      console.error("Error fetching events:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
 
   // Monthly view functions
   const getPreviousMonthDays = (year: number, month: number): number[] => {
@@ -96,47 +150,6 @@ const CalendarPage: React.FC = () => {
 
     return weeks;
   };
-
-  // Sample events data
-  const events: Event[] = [
-    {
-      id: 1,
-      title: "Introduction to Software Engineering",
-      club: "CSE Club",
-      time: "5:00 - 6:00 PM",
-      date: new Date(2024, 10, 10),
-      attending: 2,
-      tags: ["CSE", "Interested"],
-    },
-    {
-      id: 2,
-      title: "Introduction to Computer Architecture",
-      club: "CSE Club",
-      time: "6:00 - 7:30 PM",
-      date: new Date(2024, 10, 11),
-      attending: 2,
-      tags: ["CSE", "Interested"],
-    },
-
-    {
-      id: 3,
-      title: "Introduction to Artificial Intelligence",
-      club: "CSE Club",
-      time: "6:00 - 7:30 PM",
-      date: new Date(2024, 10, 12),
-      attending: 2,
-      tags: ["CSE", "Interested"],
-    },
-    {
-      id: 4,
-      title: "Introduction to Computer Vision",
-      club: "CSE Club",
-      time: "6:00 - 7:30 PM",
-      date: new Date(2024, 11, 2),
-      attending: 2,
-      tags: ["CSE", "Interested"],
-    },
-  ];
 
   const handlePrevious = (): void => {
     setDate(new Date(date.getFullYear(), date.getMonth() - 1));
@@ -207,9 +220,40 @@ const CalendarPage: React.FC = () => {
     endDate.setDate(startDate.getDate() + 6);
 
     return events.filter((event) => {
-      return event.date >= startDate && event.date <= endDate;
+      const eventDate = new Date(event.date);
+      return eventDate >= startDate && eventDate <= endDate;
     });
   };
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          p: 3,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Typography>Loading events...</Typography>
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box
+        sx={{
+          p: 3,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Typography color="error">{error}</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ p: 3, maxWidth: 1400, margin: "0 auto", mt: 8 }}>
@@ -314,8 +358,8 @@ const CalendarPage: React.FC = () => {
                           {isCurrentMonth &&
                             events.some(
                               (event) =>
-                                event.date.getDate() === day &&
-                                event.date.getMonth() ===
+                                new Date(event.date).getDate() === day &&
+                                new Date(event.date).getMonth() ===
                                   (isCurrentMonth
                                     ? date.getMonth()
                                     : day > 15
@@ -363,29 +407,27 @@ const CalendarPage: React.FC = () => {
               </Typography>
               {getEventsInRange(clickedDate, events).length > 0 ? (
                 getEventsInRange(clickedDate, events).map((event) => (
-                  <Card key={event.id} sx={{ mb: 2 }}>
-                    <CardContent>
-                      <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 2 }}
-                      >
-                        <Computer sx={{ color: "primary.main" }} />
-                        <Box>
-                          <Typography variant="h6">{event.title}</Typography>
-                          <Typography color="textSecondary">
-                            {event.club} • {event.time}
-                          </Typography>
-                          <Typography color="textSecondary">
-                            {event.date.toDateString()}
-                          </Typography>
-                          <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
-                            {event.tags.map((tag) => (
-                              <Chip key={tag} label={tag} size="small" />
-                            ))}
-                          </Box>
-                        </Box>
-                      </Box>
-                    </CardContent>
-                  </Card>
+                  <EventCard
+                    key={event.event_id}
+                    id={event.event_id}
+                    club={event.club || ""}
+                    title={event.title}
+                    date={new Date(event.date).toDateString()}
+                    room={event.room}
+                    favorite={event.favorite || false}
+                    incentives={
+                      Array.isArray(event.incentives) ? event.incentives : []
+                    }
+                    toggleFavorite={(id) => {
+                      setEvents((prevEvents) =>
+                        prevEvents.map((e) =>
+                          e.event_id === id
+                            ? { ...e, favorite: !e.favorite }
+                            : e
+                        )
+                      );
+                    }}
+                  />
                 ))
               ) : (
                 <Typography color="textSecondary">

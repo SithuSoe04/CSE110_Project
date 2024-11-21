@@ -3,35 +3,112 @@ import EventCard from "../components/Events/EventCard";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid2";
 import { Typography } from "@mui/material";
-import { fetchUpcomingEvents, fetchFavoriteEvents, fetchUpcomingNonFavoriteEvents } from "../utils/events-utils";
-import { userFavoriteEvent, userUnfavoriteEvent } from "../utils/user-utils";
+import { fetchUpcomingEvents, fetchFavoriteEvents } from "../utils/events-utils";
 
 const Events = () => {
-  const [eventData, setEventData] = useState<{id: number, club: string, club_name: string, title: string, date: string, room: string, incentives: string[], favorite: boolean}[]>([]);
+  // const initialEventData = [
+  //   {
+  //       id: 1,
+  //       club: "CSES",
+  //       title: "Software Engineering 101",
+  //       date: "10 Nov 2024",
+  //       room: "CSE1202",
+  //       incentives: ["Food"],
+  //       favorite: false,
+  //   },
+  //   {
+  //       id: 2,
+  //       club: "CSES",
+  //       title: "Software Engineering 101",
+  //       date: "10 Nov 2024",
+  //       room: "CSE1202",
+  //       incentives: ["Food"],
+  //       favorite: false,
+  //   },
+  //   {
+  //       id: 3,
+  //       club: "CSES",
+  //       title: "Software Engineering 101",
+  //       date: "10 Nov 2024",
+  //       room: "CSE1202",
+  //       incentives: ["Food"],
+  //       favorite: false,
+  //   },
+  //   {
+  //       id: 4,
+  //       club: "CSES",
+  //       title: "Software Engineering 101",
+  //       date: "10 Nov 2024",
+  //       room: "CSE1202",
+  //       incentives: ["Food"],
+  //       favorite: false,
+  //   },
+  //   {
+  //       id: 5,
+  //       club: "CSES",
+  //       title: "Software Engineering 101",
+  //       date: "10 Nov 2024",
+  //       room: "CSE1202",
+  //       incentives: ["Food"],
+  //       favorite: false,
+  //   },
+  //   {
+  //       id: 6,
+  //       club: "CSES",
+  //       title: "Software Engineering 101",
+  //       date: "10 Nov 2024",
+  //       room: "CSE1202",
+  //       incentives: ["Food"],
+  //       favorite: false,
+  //   },
+  //   {
+  //       id: 7,
+  //       club: "CSES",
+  //       title: "Software Engineering 101",
+  //       date: "10 Nov 2024",
+  //       room: "CSE1202",
+  //       incentives: ["Food"],
+  //       favorite: true,
+  //   },
+  //   {
+  //       id: 8,
+  //       club: "CSES",
+  //       title: "Software Engineering 101",
+  //       date: "10 Nov 2024",
+  //       room: "CSE1202",
+  //       incentives: ["Food"],
+  //       favorite: true,
+  //   },
+  // ];
+  // const [eventData, setEventData] = useState(initialEventData);
+  // const toggleFavorite = (id: number) => {
+  //   setEventData(prevData =>
+  //     prevData.map(event =>
+  //       event.id === id ? { ...event, favorite: !event.favorite } : event
+  //     )
+  //   );
+  // };
+
+  // const favoriteEvents = eventData.filter((event) => event.favorite);
+  // const upcomingEvents = eventData.filter((event) => !event.favorite);
+  const [eventData, setEventData] = useState<{id: number, club: string, title: string, date: string, room: string, incentives: string[], favorite: boolean}[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const upcomingEvents = await fetchUpcomingNonFavoriteEvents();
-        const favoriteEvents = await fetchFavoriteEvents();
+        const [upcomingEvents, favoriteEvents] = await Promise.all([
+          fetchUpcomingEvents(),
+          fetchFavoriteEvents()
+        ]);
+
         const allEvents = [
-          ...upcomingEvents.map((event: any) => ({ ...event,
-            id: event.event_id, 
-            club: event.club_id,
-            club_name: event.club_name,
-            favorite: false,
-            incentives: JSON.parse(event.incentives)})),
-          ...favoriteEvents.map((event: any) => ({ ...event,    
-            id: event.event_id, 
-            club: event.club_id,
-            club_name: event.club_name,
-            favorite: true,
-            incentives: JSON.parse(event.incentives) }))
+          ...upcomingEvents.map((event: any) => ({ ...event, favorite: false })),
+          ...favoriteEvents.map((event: any) => ({ ...event, favorite: true }))
         ];
+
         setEventData(allEvents);  
-        console.log(allEvents);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching events:", error);
@@ -43,40 +120,12 @@ const Events = () => {
     fetchData();
   }, []);
 
-  const user_id = parseInt(localStorage.getItem('user_id') || '');
-  const toggleFavorite = async (id: number) => {
-    if (favoriteEvents.some(event => event.id === id)){
-      try {
-        await userUnfavoriteEvent(user_id, id);
-        setEventData(prevData =>
-          prevData.map(event =>
-            event.id === id ? { ...event, favorite: !event.favorite } : event
-          )
-        );
-        setLoading(false);
-      }
-      catch (error){
-        console.error("Error favoriting events:", error);
-        setError("Failed to favorite events.");
-        setLoading(false);
-      }
-    }
-    else {
-      try {
-        await userFavoriteEvent(user_id, id);
-        setEventData(prevData =>
-          prevData.map(event =>
-            event.id === id ? { ...event, favorite: !event.favorite } : event
-          )
-        );
-        setLoading(false);
-      }
-      catch (error){
-        console.error("Error favoriting events:", error);
-        setError("Failed to favorite events.");
-        setLoading(false);
-      }
-    }
+  const toggleFavorite = (id: number) => {
+    setEventData(prevData =>
+      prevData.map(event =>
+        event.id === id ? { ...event, favorite: !event.favorite } : event
+      )
+    );
   };
 
   const favoriteEvents = eventData.filter((event) => event.favorite);
@@ -97,7 +146,7 @@ const Events = () => {
       </Typography>
       <Grid container spacing={2} mb={5}>
         {favoriteEvents.map((data) => (
-          <Grid data-testid={`favorite-event-${data.id}`} key={data.id} size={3}><EventCard id={data.id} club={data.club_name} title={data.title} date={data.date} room={data.room} favorite={data.favorite} toggleFavorite={toggleFavorite} incentives={data.incentives}/>
+          <Grid data-testid={`favorite-event-${data.id}`} key={data.id} size={3}><EventCard id={data.id} club={data.club} title={data.title} date={data.date} room={data.room} favorite={data.favorite} toggleFavorite={toggleFavorite} incentives={data.incentives}/>
           </Grid>
         ))}
       </Grid>
@@ -106,7 +155,7 @@ const Events = () => {
       </Typography>
       <Grid container spacing={2}>
         {upcomingEvents.map((data) => (
-          <Grid data-testid={`upcoming-event-${data.id}`}key={data.id} size={3}><EventCard id={data.id} club={data.club_name} title={data.title} date={data.date} room={data.room} favorite={data.favorite} toggleFavorite={toggleFavorite} incentives={data.incentives}/>
+          <Grid data-testid={`upcoming-event-${data.id}`}key={data.id} size={3}><EventCard id={data.id} club={data.club} title={data.title} date={data.date} room={data.room} favorite={data.favorite} toggleFavorite={toggleFavorite} incentives={data.incentives}/>
           </Grid>
         ))}
       </Grid>
