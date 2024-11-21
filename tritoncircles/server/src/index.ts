@@ -1,8 +1,7 @@
-import { Request, Response } from "express";
+import { Response } from "express";
+import { budget } from "./constants";
 import initDB from "./createTable";
 import { createEventEndpoints } from "./events/events-endpoints";
-import { createUserEndpoints } from "./users/users-endpoints";
-import { createFriendsEndpoints } from "./friends/friends-endpoints";
 
 //added
 import { seedEvents } from './events/testEvents';
@@ -33,13 +32,11 @@ app.listen(port, () => {
 await seedEvents(db);
 
  // Root endpoint to get test if the server is running
- app.get("/", (req: Request, res: Response) => {
+ app.get("/", (res: Response) => {
    res.send({ "data": "Hello, TypeScript Express!" });
    res.status(200);
  });
 
  createEventEndpoints(app, db);
- createUserEndpoints(app, db);
- createFriendsEndpoints(app, db);
 })();
 

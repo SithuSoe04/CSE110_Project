@@ -1,8 +1,10 @@
 import { Database } from "sqlite";
-import { createEvent, deleteEvent, getAllClubEvents, getUserUpcomingEvents, getUserFavoriteEvents, getUserNonFavoriteEvents} from "./events-utils";
+//initializeTestData has been added
+import { createEvent, deleteEvent, getAllClubEvents, getUserUpcomingEvents, getUserFavoriteEvents, initializeTestData } from "./events-utils";
 import { Request, Response } from "express";
 
 export function createEventEndpoints(app: any, db: Database) {
+
   app.post("/events", (req: Request, res: Response) => {
 
     createEvent(req, res, db);
@@ -24,13 +26,6 @@ export function createEventEndpoints(app: any, db: Database) {
     getUserUpcomingEvents(req, res, db);
     
   });
-
-  app.get("/nonfavoriteevents", (req: Request, res: Response) => {
-
-    getUserNonFavoriteEvents(req, res, db);
-    
-  });
-
   app.get("/favoriteevents", (req: Request, res: Response) => {
 
     getUserFavoriteEvents(req, res, db);
