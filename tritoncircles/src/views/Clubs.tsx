@@ -6,6 +6,9 @@ import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
+import TextField from "@mui/material/TextField";
+import InputAdornment from "@mui/material/InputAdornment";
+import SearchIcon from "@mui/icons-material/Search";
 import axios from "axios";
 
 interface Club {
@@ -21,6 +24,7 @@ const Clubs = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: "" });
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchClubs = async () => {
@@ -61,7 +65,7 @@ const Clubs = () => {
       const response = await axios.post(
         "http://localhost:8080/api/clubs/favorite",
         {
-          userId: 1,
+          userId: 1, // Using default user ID
           clubId: clubId
         },
         {
@@ -108,6 +112,14 @@ const Clubs = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
+  const filteredClubs = clubs.filter(club => 
+    club.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    club.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const favoriteClubs = filteredClubs.filter(club => club.favorite);
+  const otherClubs = filteredClubs.filter(club => !club.favorite);
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
@@ -130,11 +142,27 @@ const Clubs = () => {
     );
   }
 
-  const favoriteClubs = clubs.filter(club => club.favorite);
-  const otherClubs = clubs.filter(club => !club.favorite);
-
   return (
     <Box sx={{ flexGrow: 1, margin: "3rem" }}>
+      {/* Search Bar */}
+      <Box sx={{ mb: 4 }}>
+        <TextField
+          fullWidth
+          variant="outlined"
+          placeholder="Search clubs by name or description..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Box>
+
+      {/* Favorite Clubs Section */}
       <Typography gutterBottom variant="h4">
         <Box sx={{ fontWeight: "bold" }}>Favorite Clubs</Box>
       </Typography>
@@ -151,8 +179,16 @@ const Clubs = () => {
             />
           </Grid>
         ))}
+        {favoriteClubs.length === 0 && (
+          <Grid item xs={12}>
+            <Typography variant="body1" color="text.secondary">
+              No favorite clubs yet. Click the heart icon to add clubs to your favorites.
+            </Typography>
+          </Grid>
+        )}
       </Grid>
 
+      {/* Other Clubs Section */}
       <Typography gutterBottom variant="h4">
         <Box sx={{ fontWeight: "bold" }}>Other Clubs</Box>
       </Typography>
@@ -169,8 +205,16 @@ const Clubs = () => {
             />
           </Grid>
         ))}
+        {otherClubs.length === 0 && (
+          <Grid item xs={12}>
+            <Typography variant="body1" color="text.secondary">
+              No clubs found matching your search.
+            </Typography>
+          </Grid>
+        )}
       </Grid>
 
+      {/* Snackbar for notifications */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}
