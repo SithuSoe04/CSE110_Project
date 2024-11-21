@@ -5,6 +5,10 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid2";
 import { Typography } from "@mui/material";
 import FAQ from "../components/FAQ/FAQ";
+import {Navigate} from 'react-router-dom';
+import {useAuth} from '../context/AuthContext';
+
+
 
 const Home = () => {
   const favoriteEventsData = [
@@ -44,6 +48,11 @@ const Home = () => {
         incentives: ["Food"],
         favorite: true,
     }]
+    const {isAuthenticated} = useAuth();
+
+    if(!isAuthenticated){
+        return <Navigate to="/login" replace />;
+    }
 
     const recruitmentData = [
       {

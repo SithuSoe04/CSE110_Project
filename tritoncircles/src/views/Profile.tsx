@@ -4,6 +4,8 @@ import defaultImage from "../assets/profile.jpeg";
 import editIcon from "../assets/edit.png";
 import edit1Icon from "../assets/edit1.png";
 import checkIcon from "../assets/check.png";
+import {Navigate} from 'react-router-dom';
+import {useAuth} from '../context/AuthContext';
 
 const Profile = () => {
     const [profileImage, setProfileImage] = useState<string>(defaultImage);
@@ -12,6 +14,11 @@ const Profile = () => {
     const [interests, setInterests] = useState(["Front-End", "Robotics", "Dance"]);
     const [newInterest, setNewInterest] = useState<string>("");
     const [isAddingInterest, setIsAddingInterest] = useState<boolean>(false);
+    const {isAuthenticated} = useAuth();
+
+    if(!isAuthenticated){
+        return <Navigate to="/login" replace />;
+    }
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];

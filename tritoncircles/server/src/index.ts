@@ -1,13 +1,15 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import { budget } from "./constants";
 import initDB from "./createTable";
 import { createEventEndpoints } from "./events/events-endpoints";
+import { createUserEndpoints } from "./users/users-endpoints";
 
 const express = require("express");
+const router = express.Router();
 const cors = require("cors");
 
 const app = express();
-const port = 8080;
+const port = 8102;
 
 app.use(cors());
 app.use(express.json());
@@ -22,11 +24,11 @@ app.listen(port, () => {
  const db = await initDB();
 
  // Root endpoint to get test if the server is running
- app.get("/", (res: Response) => {
-   res.send({ "data": "Hello, TypeScript Express!" });
-   res.status(200);
+ app.get("/", (req: Request, res: Response) => {
+   res.status(200).send({ "data": "Hello, TypeScript Express!" });
  });
 
+ createUserEndpoints(app, db);
  createEventEndpoints(app, db);
 })();
 

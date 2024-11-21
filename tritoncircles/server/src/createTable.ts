@@ -16,7 +16,8 @@ const initDB = async () => {
     password VARCHAR(50) NOT NULL,
     college VARCHAR(50),
     major VARCHAR(50),
-    interests TEXT
+    year VARCHAR(50),
+    minor VARCHAR(50)
    );
 
    CREATE TABLE IF NOT EXISTS events (
