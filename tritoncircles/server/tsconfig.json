@@ -1,10 +1,19 @@
 {
   "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "./",
     "strict": true,
     "esModuleInterop": true,
-    "module": "commonjs",
-    "target": "ES6" 
-  }
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "typeRoots": ["./node_modules/@types"],
+    "types": ["node", "express"],
+    "lib": ["es6", "dom"],
+    "resolveJsonModule": true
+  },
+  "include": ["./**/*"],
+  "exclude": ["node_modules", "dist"]
 }
