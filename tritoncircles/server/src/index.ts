@@ -4,13 +4,19 @@ import initDB from "./createTable";
 import { createEventEndpoints } from "./events/events-endpoints";
 import { createUserEndpoints } from "./users/users-endpoints";
 
+//added
+import { seedEvents } from './events/testEvents';
+
 const express = require("express");
 const cors = require("cors");
 
 const app = express();
 const port = 8102;
 
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000', // your frontend URL
+    credentials: true
+  }));
 app.use(express.json());
 
 // Start the server
@@ -21,6 +27,10 @@ app.listen(port, () => {
 // Initialize the database and start the server
 (async () => {
  const db = await initDB();
+
+//added
+// Seed test events
+await seedEvents(db);
 
  // Root endpoint to get test if the server is running
  app.get("/", (req: Request, res: Response) => {

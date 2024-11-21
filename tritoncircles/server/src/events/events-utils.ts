@@ -1,5 +1,18 @@
 import { Database } from "sqlite";
 import { Request, Response } from "express";
+//added import
+import { seedEvents } from './testEvents';
+
+// Add this new function
+export async function initializeTestData(db: Database) {
+    try {
+        await seedEvents(db);
+        return { success: true, message: 'Test data initialized successfully' };
+    } catch (error) {
+        return { success: false, message: `Error initializing test data: ${error}` };
+    }
+}
+
 
 export async function createEvent(req: Request, res: Response, db: Database) {
     const {club_id, title, date, room, incentives} = req.body as {club_id: number, title: string, date: string, room: string, incentives?: string}
