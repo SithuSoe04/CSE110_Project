@@ -1,6 +1,5 @@
 import { API_BASE_URL } from "../constants/constants";
 
-// Fetch all friend requests
 export const fetchFriendRequests = async () => {
   const user_id = localStorage.getItem("user_id");
 
