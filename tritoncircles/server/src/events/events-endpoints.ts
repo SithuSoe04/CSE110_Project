@@ -1,6 +1,6 @@
 import { Database } from "sqlite";
 //initializeTestData has been added
-import { createEvent, deleteEvent, getAllClubEvents, getUserUpcomingEvents, getUserFavoriteEvents, initializeTestData } from "./events-utils";
+import { createEvent, deleteEvent, getAllClubEvents, getUserUpcomingEvents, getUserFavoriteEvents} from "./events-utils";
 import { Request, Response } from "express";
 
 export function createEventEndpoints(app: any, db: Database) {
