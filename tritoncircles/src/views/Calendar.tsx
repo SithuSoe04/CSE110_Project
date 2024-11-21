@@ -151,47 +151,6 @@ const CalendarPage: React.FC = () => {
     return weeks;
   };
 
-  // Sample events data
-  //   const events: Event[] = [
-  //     {
-  //       id: 1,
-  //       title: "Introduction to Software Engineering",
-  //       club: "CSE Club",
-  //       time: "5:00 - 6:00 PM",
-  //       date: new Date(2024, 10, 10),
-  //       attending: 2,
-  //       tags: ["CSE", "Interested"],
-  //     },
-  //     {
-  //       id: 2,
-  //       title: "Introduction to Computer Architecture",
-  //       club: "CSE Club",
-  //       time: "6:00 - 7:30 PM",
-  //       date: new Date(2024, 10, 11),
-  //       attending: 2,
-  //       tags: ["CSE", "Interested"],
-  //     },
-
-  //     {
-  //       id: 3,
-  //       title: "Introduction to Artificial Intelligence",
-  //       club: "CSE Club",
-  //       time: "6:00 - 7:30 PM",
-  //       date: new Date(2024, 10, 12),
-  //       attending: 2,
-  //       tags: ["CSE", "Interested"],
-  //     },
-  //     {
-  //       id: 4,
-  //       title: "Introduction to Computer Vision",
-  //       club: "CSE Club",
-  //       time: "6:00 - 7:30 PM",
-  //       date: new Date(2024, 11, 2),
-  //       attending: 2,
-  //       tags: ["CSE", "Interested"],
-  //     },
-  //   ];
-
   const handlePrevious = (): void => {
     setDate(new Date(date.getFullYear(), date.getMonth() - 1));
   };
