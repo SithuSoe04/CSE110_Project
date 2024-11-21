@@ -15,6 +15,7 @@ const Profile = () => {
     const [newInterest, setNewInterest] = useState<string>("");
     const [isAddingInterest, setIsAddingInterest] = useState<boolean>(false);
     const {isAuthenticated} = useAuth();
+    const number = 0;
 
     if(!isAuthenticated){
         return <Navigate to="/login" replace />;
