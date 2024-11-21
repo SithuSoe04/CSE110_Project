@@ -32,7 +32,7 @@ export const fetchFriendRequests = async () => {
 };
 
 // Accept a friend request
-export const acceptRequest = async (type: "friend", id: number) => {
+export const acceptRequest = async (id: number) => {
   const user_id = localStorage.getItem("user_id");
 
   if (!user_id) {
@@ -41,7 +41,7 @@ export const acceptRequest = async (type: "friend", id: number) => {
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/${type}s/requests/${id}/accept`, {
+    const response = await fetch(`${API_BASE_URL}/friends/requests/${id}/accept`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -51,21 +51,22 @@ export const acceptRequest = async (type: "friend", id: number) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Error accepting ${type} request:`, errorText);
+      console.error(`Error accepting friend request:`, errorText);
       return [];
     }
 
     const data = await response.json();
-    console.log(`${type} request accepted.`);
+    console.log(`Friend request accepted.`);
     return data.data || [];
   } catch (err) {
-    console.error(`Unexpected error accepting ${type} request:`, err);
+    console.error(`Unexpected error accepting friend request:`, err);
     return [];
   }
 };
 
+
 // Decline a friend request
-export const declineRequest = async (type: "friend", id: number) => {
+export const declineRequest = async (id: number) => {
   const user_id = localStorage.getItem("user_id");
 
   if (!user_id) {
@@ -74,7 +75,7 @@ export const declineRequest = async (type: "friend", id: number) => {
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/${type}s/requests/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/friends/requests/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -84,18 +85,19 @@ export const declineRequest = async (type: "friend", id: number) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Error declining ${type} request:`, errorText);
+      console.error(`Error declining friend request:`, errorText);
       return [];
     }
 
     const data = await response.json();
-    console.log(`${type} request declined.`);
+    console.log(`Friend request declined.`);
     return data.data || [];
   } catch (err) {
-    console.error(`Unexpected error declining ${type} request:`, err);
+    console.error(`Unexpected error declining friend request:`, err);
     return [];
   }
 };
+
 
 export const fetchFriendsInterestedEvents = async () => {
   const user_id = localStorage.getItem("user_id");

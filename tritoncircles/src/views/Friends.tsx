@@ -34,7 +34,7 @@ const Friends: React.FC = () => {
 
   const handleAccept = async (request: any) => {
     try {
-      await acceptRequest("friend", request.request_id); // Use the correct property (request_id)
+      await acceptRequest(request.request_id); // Use the correct property (request_id)
       setAcceptedFriends((prev) => [...prev, request]);
       setFriendRequests((prev) =>
         prev.filter((req) => req.request_id !== request.request_id) // Filter out the accepted request
@@ -46,7 +46,7 @@ const Friends: React.FC = () => {
 
   const handleDecline = async (request: any) => {
     try {
-      await declineRequest("friend", request.request_id); // Use the correct property (request_id)
+      await declineRequest(request.request_id); // Use the correct property (request_id)
       setFriendRequests((prev) =>
         prev.map((req) =>
           req.request_id === request.request_id
