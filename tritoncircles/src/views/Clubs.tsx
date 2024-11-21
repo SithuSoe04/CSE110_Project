@@ -19,42 +19,47 @@ interface Club {
   favorite: boolean;
 }
 
-const Clubs = () => {
+interface SnackbarState {
+  open: boolean;
+  message: string;
+}
+
+const Clubs: React.FC = () => {
   const [clubs, setClubs] = useState<Club[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [snackbar, setSnackbar] = useState({ open: false, message: "" });
-  const [searchTerm, setSearchTerm] = useState("");
+  const [snackbar, setSnackbar] = useState<SnackbarState>({ open: false, message: "" });
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
+  const fetchClubs = async () => {
+    try {
+      setLoading(true);
+      console.log("Fetching clubs...");
+      
+      const response = await axios.get<{ clubs: Club[] }>("http://localhost:8080/api/clubs");
+      console.log("Raw response:", response.data);
+
+      if (!response.data || !response.data.clubs) {
+        throw new Error("Invalid data format received from server");
+      }
+
+      const initialClubs = response.data.clubs.map((club: Club) => ({
+        ...club,
+        favorite: Boolean(club.favorite)
+      }));
+
+      console.log("Processed clubs:", initialClubs);
+      setClubs(initialClubs);
+      setError(null);
+    } catch (err) {
+      console.error("Error details:", err);
+      setError(err instanceof Error ? err.message : "Failed to load clubs");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchClubs = async () => {
-      try {
-        setLoading(true);
-        console.log("Fetching clubs...");
-        
-        const response = await axios.get("http://localhost:8080/api/clubs");
-        console.log("Raw response:", response.data);
-
-        if (!response.data || !response.data.clubs) {
-          throw new Error("Invalid data format received from server");
-        }
-
-        const initialClubs = response.data.clubs.map((club: any) => ({
-          ...club,
-          favorite: Boolean(club.favorite)
-        }));
-
-        console.log("Processed clubs:", initialClubs);
-        setClubs(initialClubs);
-        setError(null);
-      } catch (err) {
-        console.error("Error details:", err);
-        setError(err instanceof Error ? err.message : "Failed to load clubs");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchClubs();
   }, []);
 
@@ -62,10 +67,10 @@ const Clubs = () => {
     try {
       console.log("Attempting to toggle favorite for club:", clubId);
       
-      const response = await axios.post(
+      const response = await axios.post<{ success: boolean; message: string; error?: string }>(
         "http://localhost:8080/api/clubs/favorite",
         {
-          userId: 1, // Using default user ID
+          userId: 1,
           clubId: clubId
         },
         {
@@ -78,8 +83,8 @@ const Clubs = () => {
       console.log("Toggle response:", response.data);
 
       if (response.data.success) {
-        setClubs(prevClubs => 
-          prevClubs.map(club => 
+        setClubs((prevClubs: Club[]) => 
+          prevClubs.map((club: Club) => 
             club.club_id === clubId 
               ? { ...club, favorite: !club.favorite }
               : club
@@ -97,8 +102,8 @@ const Clubs = () => {
       console.error("Error toggling favorite:", err);
       let errorMessage = "Failed to update favorite status";
       
-      if (axios.isAxiosError(err) && err.response) {
-        errorMessage = err.response.data.error || errorMessage;
+      if (axios.isAxiosError(err) && err.response?.data?.error) {
+        errorMessage = err.response.data.error;
       }
 
       setSnackbar({
@@ -109,16 +114,16 @@ const Clubs = () => {
   };
 
   const handleCloseSnackbar = () => {
-    setSnackbar({ ...snackbar, open: false });
+    setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
-  const filteredClubs = clubs.filter(club => 
+  const filteredClubs = clubs.filter((club: Club) => 
     club.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     club.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const favoriteClubs = filteredClubs.filter(club => club.favorite);
-  const otherClubs = filteredClubs.filter(club => !club.favorite);
+  const favoriteClubs = filteredClubs.filter((club: Club) => club.favorite);
+  const otherClubs = filteredClubs.filter((club: Club) => !club.favorite);
 
   if (loading) {
     return (
@@ -167,19 +172,20 @@ const Clubs = () => {
         <Box sx={{ fontWeight: "bold" }}>Favorite Clubs</Box>
       </Typography>
       <Grid container spacing={2} mb={5}>
-        {favoriteClubs.map((club) => (
-          <Grid key={club.club_id} item xs={12} sm={6} md={4} lg={3}>
-            <ClubCard
-              id={club.club_id}
-              name={club.name}
-              description={club.description}
-              link={club.link}
-              favorite={club.favorite}
-              toggleFavorite={handleToggleFavorite}
-            />
-          </Grid>
-        ))}
-        {favoriteClubs.length === 0 && (
+        {favoriteClubs.length > 0 ? (
+          favoriteClubs.map((club: Club) => (
+            <Grid key={club.club_id} item xs={12} sm={6} md={4} lg={3}>
+              <ClubCard
+                id={club.club_id}
+                name={club.name}
+                description={club.description}
+                link={club.link}
+                favorite={club.favorite}
+                toggleFavorite={handleToggleFavorite}
+              />
+            </Grid>
+          ))
+        ) : (
           <Grid item xs={12}>
             <Typography variant="body1" color="text.secondary">
               No favorite clubs yet. Click the heart icon to add clubs to your favorites.
@@ -193,22 +199,23 @@ const Clubs = () => {
         <Box sx={{ fontWeight: "bold" }}>Other Clubs</Box>
       </Typography>
       <Grid container spacing={2}>
-        {otherClubs.map((club) => (
-          <Grid key={club.club_id} item xs={12} sm={6} md={4} lg={3}>
-            <ClubCard
-              id={club.club_id}
-              name={club.name}
-              description={club.description}
-              link={club.link}
-              favorite={club.favorite}
-              toggleFavorite={handleToggleFavorite}
-            />
-          </Grid>
-        ))}
-        {otherClubs.length === 0 && (
+        {otherClubs.length > 0 ? (
+          otherClubs.map((club: Club) => (
+            <Grid key={club.club_id} item xs={12} sm={6} md={4} lg={3}>
+              <ClubCard
+                id={club.club_id}
+                name={club.name}
+                description={club.description}
+                link={club.link}
+                favorite={club.favorite}
+                toggleFavorite={handleToggleFavorite}
+              />
+            </Grid>
+          ))
+        ) : (
           <Grid item xs={12}>
             <Typography variant="body1" color="text.secondary">
-              No clubs found matching your search.
+              {searchTerm ? "No clubs found matching your search." : "No clubs available."}
             </Typography>
           </Grid>
         )}
