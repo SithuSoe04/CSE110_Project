@@ -38,7 +38,7 @@ export const acceptRequest = async (id: number) => {
     console.error("User is not logged in.");
     return [];
   }
-  
+
   try {
     const response = await fetch(`${API_BASE_URL}/friends/requests/${id}/accept`, {
       method: "POST",

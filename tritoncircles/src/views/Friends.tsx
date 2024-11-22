@@ -194,6 +194,7 @@ const Friends: React.FC = () => {
             </ListItem>
           ))}
         </List>
+        
       ) : (
         <Typography variant="body2" sx={{ color: "gray", mt: 1 }}>
           No accepted friends yet.

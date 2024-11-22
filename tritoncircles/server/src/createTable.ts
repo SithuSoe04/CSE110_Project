@@ -7,17 +7,6 @@ const initDB = async () => {
     driver: sqlite3.Database,
   });
 
-  // Fully clear data from all tables
-  await db.exec(`
-    DELETE FROM users;
-    DELETE FROM events;
-    DELETE FROM clubs;
-    DELETE FROM event_favorites;
-    DELETE FROM club_favorites;
-    DELETE FROM friend_requests;
-    DELETE FROM friends;
-    DELETE FROM friends_interested_events;
-  `);
 
   // Ensure tables are created or updated
   await db.exec(`
@@ -91,66 +80,6 @@ const initDB = async () => {
       PRIMARY KEY(friend_id, event_id)
     );
   `);
-
-  // Insert sample data into all tables
-  await db.exec(`
-    -- Sample data for users table
-    INSERT INTO users (user_id, name, email, password, college, major, interests)
-    VALUES 
-      (1, 'Alice', 'alice@example.com', 'password123', 'Engineering', 'CSE', 'AI, Robotics'),
-      (2, 'Bob', 'bob@example.com', 'password123', 'Science', 'Physics', 'Quantum Computing'),
-      (3, 'Charlie', 'charlie@example.com', 'password123', 'Arts', 'Literature', 'Writing, Poetry');
-
-    -- Sample data for clubs table
-    INSERT INTO clubs (club_id, name, description)
-    VALUES
-      (1, 'CSES', 'Computer Science and Engineering Society'),
-      (2, 'Physics Club', 'Exploring the world of physics and beyond');
-
-    -- Sample data for events table
-    INSERT INTO events (event_id, club_id, title, date, room, incentives)
-    VALUES
-      (1, 1, 'Software Engineering 101', '2024-12-10 14:00:00', 'CSE1202', 'Food, Networking'),
-      (2, 1, 'Advanced Robotics', '2024-12-15 10:00:00', 'Robotics Lab', 'Hands-on Workshop'),
-      (3, 2, 'Quantum Physics Meetup', '2024-12-20 16:00:00', 'Physics Building', 'Guest Lectures');
-
-    -- Sample data for friend_requests table
-    INSERT INTO friend_requests (sender_id, sender_name, user_id, status, message)
-    VALUES
-      (1, 'Alice', 3, 'pending', 'Hi Charlie, let us connect!'),
-      (2, 'Bob', 3, 'pending', 'Hi Charlie, looking forward to collaborating!');
-
-    -- Sample data for friends table
-    INSERT INTO friends (connection, friendship_date)
-    VALUES 
-      ('3,1', '2024-01-01 10:00:00'), -- User 1 and User 2 are friends
-      ('3,2', '2024-01-05 15:30:00'); -- User 1 and User 3 are friends
-
-    -- Sample data for friends_interested_events table
-    INSERT INTO friends_interested_events (friend_id, event_id)
-    VALUES
-      (1, 1), -- Alice is interested in Software Engineering 101
-      (2, 2); -- Bob is interested in Advanced Robotics
-  `);
-
-  await db.exec(`
-  -- Sample data for event_favorites table
-  INSERT INTO event_favorites (user_id, event_id)
-  VALUES
-    (1, 1), -- Alice favors Software Engineering 101
-    (1, 2), -- Alice also favors Advanced Robotics
-    (2, 3), -- Bob favors Quantum Physics Meetup
-    (3, 1); -- Charlie favors Software Engineering 101
-
-  -- Sample data for club_favorites table
-  INSERT INTO club_favorites (user_id, club_id)
-  VALUES
-    (1, 1), -- Alice favors the CSES club
-    (2, 2), -- Bob favors the Physics Club
-    (3, 1), -- Charlie favors the CSES club
-    (3, 2); -- Charlie also favors the Physics Club
-`);
-
 
   return db;
 };

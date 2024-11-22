@@ -41,34 +41,34 @@ export function createFriendsEndpoints(app: any, db: Database) {
     }
   
     try {
-      // Prepare strings to match connections
-      const userIdString = `${userId},`; // Matches connections where user_id is first
-      const reversedUserIdString = `,${userId}`; // Matches connections where user_id is second
-  
-      const events = await db.all(
-        `
-        SELECT
-          fie.friend_id AS friendId,
-          e.event_id AS id,
-          e.title,
-          e.date,
-          c.name AS clubName
-        FROM
-          events e
-        JOIN
-          friends_interested_events fie ON e.event_id = fie.event_id
-        JOIN
-          friends f ON f.connection LIKE ? OR f.connection LIKE ?
-        JOIN
-          clubs c ON e.club_id = c.club_id
-        WHERE
-          fie.friend_id = CAST(SUBSTR(f.connection, INSTR(f.connection, ',') + 1) AS INTEGER)
-          OR
-          fie.friend_id = CAST(SUBSTR(f.connection, 1, INSTR(f.connection, ',') - 1) AS INTEGER)
-        `,
-        [`${userIdString}%`, `%${reversedUserIdString}`]
-      );
-      
+    // Prepare strings to match connections
+    const userIdString = `${userId},`; // Matches connections where user_id is first
+    const reversedUserIdString = `,${userId}`; // Matches connections where user_id is second
+
+    const events = await db.all(
+      `
+      SELECT
+        fie.friend_id AS friendId,
+        e.event_id AS id,
+        e.title,
+        e.date,
+        c.name AS clubName
+      FROM
+        events e
+      JOIN
+        friends_interested_events fie ON e.event_id = fie.event_id
+      JOIN
+        friends f ON f.connection LIKE ? OR f.connection LIKE ?
+      JOIN
+        clubs c ON e.club_id = c.club_id
+      WHERE
+        fie.friend_id = CAST(SUBSTR(f.connection, INSTR(f.connection, ',') + 1) AS INTEGER)
+        OR
+        fie.friend_id = CAST(SUBSTR(f.connection, 1, INSTR(f.connection, ',') - 1) AS INTEGER)
+      `,
+      [`${userIdString}%`, `%${reversedUserIdString}`]
+    );
+    
       res.status(200).json({ data: events || [] }); // Ensure array response
     } catch (err) {
       console.error("Error fetching friends' interested events:", err);

@@ -1,22 +1,16 @@
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Typography,
-  Avatar,
-  List,
-  ListItem,
-  Divider,
-  TextField,
-  CircularProgress,
-} from "@mui/material";
-import { fetchFriendsInterestedEvents } from "../utils/friends-utils";
+import { Box, Typography, Avatar, List, ListItem, Divider, TextField } from "@mui/material";
+import { fetchFriendsInterestedEvents } from "../utils/friends-utils"; 
 
 interface Event {
   id: number;
   title: string;
-  date: string; // Includes both date and time
-  friendId: number; // Friend associated with the event
+  date: string;
+  time: string;
+  courseCode: string;
+  friendId: number; // New field for friend ID
 }
+
 
 const FriendsInterestedEvents: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
@@ -32,13 +26,14 @@ const FriendsInterestedEvents: React.FC = () => {
         setLoading(false);
       } catch (err) {
         console.error("Error fetching events:", err);
-        setError("Failed to load friends' events.");
+        setError("Failed to load friends events.");
         setLoading(false);
       }
     };
-
+  
     fetchData();
   }, []);
+  
 
   // Filter events based on the search term
   const filteredEvents = events.filter((event) =>
@@ -46,32 +41,16 @@ const FriendsInterestedEvents: React.FC = () => {
   );
 
   if (loading) {
-    return (
-      <Box sx={{ textAlign: "center", marginTop: "20px" }}>
-        <CircularProgress />
-        <Typography sx={{ marginTop: "10px" }}>Loading events...</Typography>
-      </Box>
-    );
+    return <Typography>Loading events...</Typography>;
   }
 
   if (error) {
-    return (
-      <Typography color="error" sx={{ textAlign: "center", marginTop: "20px" }}>
-        {error}
-      </Typography>
-    );
+    return <Typography color="error">{error}</Typography>;
   }
 
   return (
     <Box sx={{ padding: "20px" }}>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          mb: 2,
-        }}
-      >
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
         <Typography variant="h4" sx={{ color: "gray" }}>
           Friends' Interested Events
         </Typography>
@@ -102,23 +81,25 @@ const FriendsInterestedEvents: React.FC = () => {
               borderRadius: 1,
             }}
           >
-            <Avatar sx={{ bgcolor: "green", mr: 2 }}>
-              {event.title.charAt(0)}
-            </Avatar>
+            <Avatar sx={{ bgcolor: "green", mr: 2 }}>{event.title.charAt(0)}</Avatar>
             <Box sx={{ flexGrow: 1 }}>
               <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                 {event.title}
               </Typography>
               <Typography variant="caption" sx={{ display: "block", color: "gray" }}>
-                {new Date(event.date).toLocaleString()} {/* Display formatted date */}
+                {event.date} - {event.time}
               </Typography>
               <Typography variant="caption" sx={{ display: "block", color: "gray" }}>
-                Friend ID: {event.friendId}
+                {event.courseCode}
+              </Typography>
+              <Typography variant="caption" sx={{ display: "block", color: "gray" }}>
+                Friend ID: {event.friendId} {/* Display friend_id */}
               </Typography>
             </Box>
           </ListItem>
         ))}
       </List>
+
     </Box>
   );
 };
