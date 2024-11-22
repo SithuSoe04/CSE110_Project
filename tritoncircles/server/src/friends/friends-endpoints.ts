@@ -3,7 +3,6 @@ import { Request, Response } from "express";
 import { getAllFriendRequests, acceptFriendRequest, declineFriendRequest,} from "./friends-utils";
 
 export function createFriendsEndpoints(app: any, db: Database) {
-  // Fetch all friend requests
   app.get("/friends/requests", (req: Request, res: Response) => {
     try {
       const user_id = req.query.user_id as string; 
@@ -18,12 +17,18 @@ export function createFriendsEndpoints(app: any, db: Database) {
     }
   });
 
-  // Accept a friend request
-  app.post("/friends/requests/:id/accept", (req: Request, res: Response) => {
-    acceptFriendRequest(req, res, db);
+  // app.post("/friends/requests/:id/accept", (req: Request, res: Response) => {
+  //   acceptFriendRequest(req, res, db);
+  // });
+  app.post("/friends/requests/:id/accept", async (req: Request, res: Response) => {
+    try {
+      await acceptFriendRequest(req, res, db);
+    } catch (err) {
+      console.error("Error accepting friend request:", err);
+      res.status(500).json({ error: "Failed to accept friend request." });
+    }
   });
-
-  // Decline a friend request
+  
   app.delete("/friends/requests/:id", (req: Request, res: Response) => {
     declineFriendRequest(req, res, db);
   });
@@ -36,6 +41,10 @@ export function createFriendsEndpoints(app: any, db: Database) {
     }
   
     try {
+      // Prepare strings to match connections
+      const userIdString = `${userId},`; // Matches connections where user_id is first
+      const reversedUserIdString = `,${userId}`; // Matches connections where user_id is second
+  
       const events = await db.all(
         `
         SELECT
@@ -43,28 +52,65 @@ export function createFriendsEndpoints(app: any, db: Database) {
           e.event_id AS id,
           e.title,
           e.date,
-          e.time,
-          e.courseCode
+          c.name AS clubName
         FROM
           events e
         JOIN
           friends_interested_events fie ON e.event_id = fie.event_id
         JOIN
-          friends f ON (f.user1_id = ? OR f.user2_id = ?)
+          friends f ON f.connection LIKE ? OR f.connection LIKE ?
+        JOIN
+          clubs c ON e.club_id = c.club_id
         WHERE
-          (f.user1_id = fie.friend_id OR f.user2_id = fie.friend_id)
-        AND
-          (f.user1_id = ? OR f.user2_id = ?)
+          fie.friend_id = CAST(SUBSTR(f.connection, INSTR(f.connection, ',') + 1) AS INTEGER)
+          OR
+          fie.friend_id = CAST(SUBSTR(f.connection, 1, INSTR(f.connection, ',') - 1) AS INTEGER)
         `,
-        [userId, userId, userId, userId]
+        [`${userIdString}%`, `%${reversedUserIdString}`]
       );
-  
+      
       res.status(200).json({ data: events || [] }); // Ensure array response
     } catch (err) {
       console.error("Error fetching friends' interested events:", err);
       res.status(500).json({ error: "Failed to fetch events." });
     }
   });
-  
-}
 
+  // app.post("/friends/requests", async (req: Request, res: Response) => {
+  //   const { sender_id, sender_name, recipient_id, message } = req.body;
+  
+  //   if (!sender_id || !recipient_id) {
+  //     return res.status(400).json({ error: "Missing sender_id or recipient_id" });
+  //   }
+  
+  //   try {
+  //     // Check if the recipient exists
+  //     const recipient = await db.get("SELECT * FROM users WHERE user_id = ?", [recipient_id]);
+  //     if (!recipient) {
+  //       return res.status(404).json({ error: "Recipient not found" });
+  //     }
+  
+  //     // Check if a request already exists
+  //     const existingRequest = await db.get(
+  //       "SELECT * FROM friend_requests WHERE sender_id = ? AND user_id = ?",
+  //       [sender_id, recipient_id]
+  //     );
+  //     if (existingRequest) {
+  //       return res.status(400).json({ error: "Friend request already sent" });
+  //     }
+  
+  //     // Insert the friend request
+  //     await db.run(
+  //       `INSERT INTO friend_requests (sender_id, sender_name, user_id, message) 
+  //        VALUES (?, ?, ?, ?)`,
+  //       [sender_id, sender_name, recipient_id, message || "Hi! Let's connect."]
+  //     );
+  
+  //     res.status(200).json({ message: "Friend request sent successfully" });
+  //   } catch (err) {
+  //     console.error("Error sending friend request:", err);
+  //     res.status(500).json({ error: "Failed to send friend request" });
+  //   }
+  // });
+  
+}  

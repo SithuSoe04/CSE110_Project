@@ -38,7 +38,7 @@ export const acceptRequest = async (id: number) => {
     console.error("User is not logged in.");
     return [];
   }
-
+  
   try {
     const response = await fetch(`${API_BASE_URL}/friends/requests/${id}/accept`, {
       method: "POST",
@@ -47,20 +47,20 @@ export const acceptRequest = async (id: number) => {
       },
       body: JSON.stringify({ user_id }),
     });
-
+  
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`Error accepting friend request:`, errorText);
       return [];
     }
-
+  
     const data = await response.json();
-    console.log(`Friend request accepted.`);
-    return data.data || [];
+    console.log("Friend request accepted successfully.");
+    return data;
   } catch (err) {
-    console.error(`Unexpected error accepting friend request:`, err);
+    console.error(`Unexpected error:`, err);
     return [];
-  }
+  }  
 };
 
 
@@ -126,3 +126,41 @@ export const fetchFriendsInterestedEvents = async () => {
     return [];
   }
 };
+
+// export const sendFriendRequest = async (recipientId: string) => {
+//   const senderId = localStorage.getItem("user_id");
+//   const senderName = localStorage.getItem("user_name");
+
+//   if (!senderId || !senderName) {
+//     console.error("User is not logged in.");
+//     throw new Error("User is not logged in.");
+//   }
+
+//   try {
+//     const response = await fetch(`${API_BASE_URL}/friends/requests`, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({
+//         sender_id: senderId,
+//         sender_name: senderName,
+//         recipient_id: recipientId,
+//         message: "Hi! Let's connect.",
+//       }),
+//     });
+
+//     if (!response.ok) {
+//       const errorText = await response.text();
+//       console.error(`Error sending friend request:`, errorText);
+//       throw new Error(errorText || "Failed to send friend request.");
+//     }
+
+//     const data = await response.json();
+//     console.log("Friend request sent successfully.");
+//     return data;
+//   } catch (err) {
+//     console.error("Unexpected error sending friend request:", err);
+//     throw err;
+//   }
+// };

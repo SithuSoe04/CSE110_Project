@@ -20,33 +20,35 @@ export async function getAllFriendRequests(
   }
 }
 
-// Utility function to accept a friend request
 export async function acceptFriendRequest(req: Request, res: Response, db: Database) {
   const { id } = req.params;
-
   try {
     // Fetch the friend request
-    const friendRequest = await db.get("SELECT * FROM friend_requests WHERE request_id = ?", [id]);
+    const friendRequest = await db.get(
+      "SELECT * FROM friend_requests WHERE sender_id = ? AND status = 'pending'",
+      [id]
+    );
+
     if (!friendRequest) {
-      return res.status(404).json({ error: "Friend request not found." });
+      return res.status(404).json({ error: "Friend request not found or already processed." });
     }
 
     // Insert the friendship into the friends table
     await db.run(
-      "INSERT INTO friends (user_id, friend_id) VALUES (?, ?), (?, ?)",
-      [friendRequest.user_id, friendRequest.sender_id, friendRequest.sender_id, friendRequest.user_id]
+      "INSERT INTO friends (connection, friendship_date) VALUES (?, ?)",
+      [friendRequest.connection, friendRequest.date]
     );
 
     // Update the friend request's status to "accepted"
-    await db.run("UPDATE friend_requests SET status = 'accepted' WHERE request_id = ?", [id]);
+    await db.run("UPDATE friend_requests SET status = 'accepted' WHERE sender_id = ?", [id]);
 
-    // Respond with success and updated status
     res.json({ message: "Friend request accepted.", status: "accepted" });
   } catch (err) {
     console.error("Error accepting friend request:", err);
     res.status(500).json({ error: "Failed to accept friend request." });
   }
 }
+
 
 // Utility function to decline a friend request
 export async function declineFriendRequest(req: Request, res: Response, db: Database) {
@@ -73,16 +75,26 @@ export async function getFriendsInterestedEvents(req: Request, res: Response, db
   }
 
   try {
+    const userIdString = `${userId},`; // Match connections where the user is the first part
+    const reversedUserIdString = `,${userId}`; // Match connections where the user is the second part
+
     const events = await db.all(
       `
-      SELECT e.event_id AS id, e.title, e.date, e.room, e.incentives
+      SELECT 
+        e.event_id AS id, 
+        e.title, 
+        e.date, 
+        e.room, 
+        e.incentives
       FROM events e
       JOIN friends_interested_events fie ON e.event_id = fie.event_id
-      JOIN friends f ON (f.user_id = ? OR f.friend_id = ?)
-      WHERE fie.friend_id = f.friend_id OR fie.friend_id = f.user_id
+      JOIN friends f ON f.connection LIKE ? OR f.connection LIKE ?
+      WHERE fie.friend_id = CAST(SUBSTR(f.connection, INSTR(f.connection, ',') + 1) AS INTEGER)
+         OR fie.friend_id = CAST(SUBSTR(f.connection, 1, INSTR(f.connection, ',') - 1) AS INTEGER)
       `,
-      [userId, userId]
+      [`${userIdString}%`, `%${reversedUserIdString}`]
     );
+
 
     res.status(200).json({ data: events });
   } catch (err) {
