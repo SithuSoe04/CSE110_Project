@@ -1,7 +1,6 @@
 import { Database } from "sqlite";
 import { Request, Response } from "express";
 
-// Utility function to fetch all friend requests
 export async function getAllFriendRequests(
   req: Request,
   res: Response,
@@ -9,10 +8,12 @@ export async function getAllFriendRequests(
   userId: string
 ) {
   try {
+    // console.log("Fetching friend requests for user_id:", userId);
     const friendRequests = await db.all(
-      "SELECT * FROM friend_requests WHERE user_id = ? AND status = 'pending'",
+      "SELECT * FROM friend_requests WHERE user_id = ?",
       [userId]
     );
+    // console.log("Friend requests result:", friendRequests); 
     res.status(200).json({ data: friendRequests });
   } catch (err) {
     console.error("Error fetching friend requests:", err);
@@ -23,7 +24,6 @@ export async function getAllFriendRequests(
 export async function acceptFriendRequest(req: Request, res: Response, db: Database) {
   const { id } = req.params;
   try {
-    // Fetch the friend request
     const friendRequest = await db.get(
       "SELECT * FROM friend_requests WHERE sender_id = ? AND status = 'pending'",
       [id]
@@ -50,13 +50,12 @@ export async function acceptFriendRequest(req: Request, res: Response, db: Datab
 }
 
 
-// Utility function to decline a friend request
 export async function declineFriendRequest(req: Request, res: Response, db: Database) {
   const { id } = req.params;
 
   try {
     // Update the friend request's status to "declined"
-    await db.run("UPDATE friend_requests SET status = 'declined' WHERE request_id = ?", [id]);
+    await db.run("UPDATE friend_requests SET status = 'declined' WHERE sender_id = ?", [id]);
 
     // Respond with success and updated status
     res.json({ message: "Friend request declined.", status: "declined" });
@@ -66,7 +65,7 @@ export async function declineFriendRequest(req: Request, res: Response, db: Data
   }
 }
 
-// Utility function to fetch friends' interested events
+
 export async function getFriendsInterestedEvents(req: Request, res: Response, db: Database) {
   const userId = req.query.user_id;
 

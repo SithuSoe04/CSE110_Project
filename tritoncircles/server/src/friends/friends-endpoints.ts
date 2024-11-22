@@ -1,16 +1,18 @@
 import { Database } from "sqlite";
 import { Request, Response } from "express";
-import { getAllFriendRequests, acceptFriendRequest, declineFriendRequest,} from "./friends-utils";
+import { getAllFriendRequests, acceptFriendRequest, declineFriendRequest } from "./friends-utils";
 
 export function createFriendsEndpoints(app: any, db: Database) {
-  app.get("/friends/requests", (req: Request, res: Response) => {
+  app.get("/friends/requests", async (req: Request, res: Response) => {
     try {
       const user_id = req.query.user_id as string; 
       console.log("user_id is", user_id);
+
       if (!user_id) {
         return res.status(400).json({ error: "Missing user_id query parameter" });
       }
-      getAllFriendRequests(req, res, db, user_id);
+      
+      await getAllFriendRequests(req, res, db, user_id);
     } catch (err) {
       console.error("Error fetching friend requests:", err);
       res.status(500).json({ error: "Internal Server Error" });
@@ -41,7 +43,6 @@ export function createFriendsEndpoints(app: any, db: Database) {
     }
   
     try {
-    // Prepare strings to match connections
     const userIdString = `${userId},`; // Matches connections where user_id is first
     const reversedUserIdString = `,${userId}`; // Matches connections where user_id is second
 
@@ -69,7 +70,7 @@ export function createFriendsEndpoints(app: any, db: Database) {
       [`${userIdString}%`, `%${reversedUserIdString}`]
     );
     
-      res.status(200).json({ data: events || [] }); // Ensure array response
+      res.status(200).json({ data: events || [] }); 
     } catch (err) {
       console.error("Error fetching friends' interested events:", err);
       res.status(500).json({ error: "Failed to fetch events." });

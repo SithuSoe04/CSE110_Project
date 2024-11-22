@@ -11,7 +11,6 @@ interface Event {
   friendId: number; // New field for friend ID
 }
 
-
 const FriendsInterestedEvents: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [searchTerm, setSearchTerm] = useState("");

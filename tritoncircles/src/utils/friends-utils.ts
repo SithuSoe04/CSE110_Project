@@ -23,6 +23,7 @@ export const fetchFriendRequests = async () => {
     }
 
     const data = await response.json();
+    // console.log("Friend requests fetched:", data.data);
     return data.data || [];
   } catch (err) {
     console.error("Unexpected error fetching friend requests:", err);
@@ -30,7 +31,7 @@ export const fetchFriendRequests = async () => {
   }
 };
 
-// Accept a friend request
+
 export const acceptRequest = async (id: number) => {
   const user_id = localStorage.getItem("user_id");
 
@@ -64,7 +65,6 @@ export const acceptRequest = async (id: number) => {
 };
 
 
-// Decline a friend request
 export const declineRequest = async (id: number) => {
   const user_id = localStorage.getItem("user_id");
 
