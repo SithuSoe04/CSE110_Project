@@ -131,9 +131,12 @@ export const fetchFriendsInterestedEvents = async () => {
 //   const senderId = localStorage.getItem("user_id");
 //   const senderName = localStorage.getItem("user_name");
 
+//   console.log(localStorage.getItem("user_id")); 
+//   console.log(localStorage.getItem("user_name"));
+
 //   if (!senderId || !senderName) {
 //     console.error("User is not logged in.");
-//     throw new Error("User is not logged in.");
+//     throw new Error("You must log in before sending friend requests.");
 //   }
 
 //   try {
@@ -164,3 +167,42 @@ export const fetchFriendsInterestedEvents = async () => {
 //     throw err;
 //   }
 // };
+
+export const sendFriendRequest = async (recipientId: string) => {
+  const senderId = localStorage.getItem("user_id");
+  const senderName = localStorage.getItem("user_name") || "Anonymous"; 
+
+  if (!senderId) {
+    console.error("User is not logged in.");
+    throw new Error("You must log in before sending friend requests.");
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/friends/requests`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        sender_id: senderId,
+        sender_name: senderName,
+        recipient_id: recipientId,
+        message: "Hi! Let's connect.",
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Error sending friend request:`, errorText);
+      throw new Error(errorText || "Failed to send friend request.");
+    }
+
+    const data = await response.json();
+    console.log("Friend request sent successfully.");
+    return data;
+  } catch (err) {
+    console.error("Unexpected error sending friend request:", err);
+    throw err;
+  }
+};
+

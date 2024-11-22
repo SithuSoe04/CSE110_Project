@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Box, Typography, Button, IconButton, List, ListItem, Avatar, TextField, Divider,} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { Link } from "react-router-dom";
-import { fetchFriendRequests, acceptRequest, declineRequest,} from "../utils/friends-utils";
+import { API_BASE_URL } from "../constants/constants";
+import { fetchFriendRequests, acceptRequest, declineRequest, sendFriendRequest } from "../utils/friends-utils";
 
 const Friends: React.FC = () => {
   const [showFriendRequests, setShowFriendRequests] = useState(false);
@@ -10,6 +11,11 @@ const Friends: React.FC = () => {
   const [friendRequests, setFriendRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // New states for search functionality
+  const [searchValue, setSearchValue] = useState<string>("");
+  const [searchResult, setSearchResult] = useState<any | null>(null);
+  const [searchError, setSearchError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,6 +65,49 @@ const Friends: React.FC = () => {
     }
   };
 
+  const handleSearch = async () => {
+    setSearchError(null);
+    setSearchResult(null);
+
+    if (!searchValue.trim()) {
+      setSearchError("Please enter a valid username or ID.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/search?query=${searchValue}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        setSearchError(errorText || "Failed to fetch search results.");
+        return;
+      }
+
+      const data = await response.json();
+      setSearchResult(data.user || null);
+    } catch (err) {
+      console.error("Error searching for user:", err);
+      setSearchError("An unexpected error occurred while searching.");
+    }
+  };
+
+  const handleSendRequest = async (recipientId: string) => {
+    try {
+      await sendFriendRequest(recipientId);
+      alert("Friend request sent successfully!");
+      setSearchResult(null);
+      setSearchValue("");
+    } catch (err) {
+      console.error("Error sending friend request:", err);
+      alert("Failed to send friend request.");
+    }
+  };
+
   if (loading) {
     return <Typography>Loading requests...</Typography>;
   }
@@ -75,11 +124,71 @@ const Friends: React.FC = () => {
 
       {/* Search Bar */}
       <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-        <TextField fullWidth placeholder="Search" variant="outlined" sx={{ mr: 1 }} />
-        <IconButton color="primary" aria-label="add">
+        <TextField fullWidth 
+        placeholder="Search" 
+        variant="outlined" 
+        value={searchValue}
+        onChange={(e) => setSearchValue(e.target.value)}
+        sx={{ mr: 1 }} />
+        <IconButton color="primary" onClick={handleSearch} aria-label="add">
           <AddIcon />
         </IconButton>
       </Box>
+
+      {searchError && (
+        <Box
+          sx={{
+            mt: 2,
+            p: 2,
+            border: "1px solid #f44336",
+            borderRadius: 1,
+            backgroundColor: "#fdecea",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <Typography color="error" sx={{ fontWeight: "bold", mr: 1 }}>
+            ⚠️
+          </Typography>
+          <Typography color="error" sx={{ fontSize: "0.9rem" }}>
+            {searchError}
+          </Typography>
+        </Box>
+      )}
+
+
+      {searchResult && (
+        <Box
+          sx={{
+            p: 2,
+            mb: 2,
+            border: "1px solid #e0e0e0",
+            borderRadius: 1,
+            backgroundColor: "#f9f9f9",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Avatar sx={{ bgcolor: "blue", mr: 2 }}>
+              {searchResult.name?.[0]}
+            </Avatar>
+            <Box>
+              <Typography variant="body1">{searchResult.name}</Typography>
+              <Typography variant="caption">ID: {searchResult.id}</Typography>
+            </Box>
+          </Box>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => handleSendRequest(searchResult.id)}
+          >
+            Add Friend
+          </Button>
+        </Box>
+      )}
+
 
       {/* Add New Friends Section */}
       <Box
@@ -96,7 +205,7 @@ const Friends: React.FC = () => {
           sx={{ textAlign: "left", color: "black" }}
           onClick={() => setShowFriendRequests(!showFriendRequests)}
         >
-          Add New Friends
+          New Friends
         </Button>
         {showFriendRequests && (
           <List>

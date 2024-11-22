@@ -77,41 +77,72 @@ export function createFriendsEndpoints(app: any, db: Database) {
     }
   });
 
-  // app.post("/friends/requests", async (req: Request, res: Response) => {
-  //   const { sender_id, sender_name, recipient_id, message } = req.body;
+
+  app.get("/users/search", async (req: Request, res: Response) => {
+    const query = req.query.query as string;
   
-  //   if (!sender_id || !recipient_id) {
-  //     return res.status(400).json({ error: "Missing sender_id or recipient_id" });
-  //   }
+    if (!query) {
+      return res.status(400).json({ error: "Search query is required." });
+    }
   
-  //   try {
-  //     // Check if the recipient exists
-  //     const recipient = await db.get("SELECT * FROM users WHERE user_id = ?", [recipient_id]);
-  //     if (!recipient) {
-  //       return res.status(404).json({ error: "Recipient not found" });
-  //     }
+    try {
+      // Query the database for matching users (by name or ID)
+      const users = await db.all(
+        `
+        SELECT user_id AS id, name 
+        FROM users 
+        WHERE name LIKE ? OR user_id LIKE ?
+        `,
+        [`%${query}%`, `%${query}%`]
+      );
   
-  //     // Check if a request already exists
-  //     const existingRequest = await db.get(
-  //       "SELECT * FROM friend_requests WHERE sender_id = ? AND user_id = ?",
-  //       [sender_id, recipient_id]
-  //     );
-  //     if (existingRequest) {
-  //       return res.status(400).json({ error: "Friend request already sent" });
-  //     }
+      if (users.length === 0) {
+        return res.status(404).json({ error: "No users found." });
+      }
   
-  //     // Insert the friend request
-  //     await db.run(
-  //       `INSERT INTO friend_requests (sender_id, sender_name, user_id, message) 
-  //        VALUES (?, ?, ?, ?)`,
-  //       [sender_id, sender_name, recipient_id, message || "Hi! Let's connect."]
-  //     );
+      res.status(200).json({ user: users[0] }); 
+    } catch (err) {
+      console.error("Error searching for user:", err);
+      res.status(500).json({ error: "Failed to search for user." });
+    }
+  });
   
-  //     res.status(200).json({ message: "Friend request sent successfully" });
-  //   } catch (err) {
-  //     console.error("Error sending friend request:", err);
-  //     res.status(500).json({ error: "Failed to send friend request" });
-  //   }
-  // });
+
+  app.post("/friends/requests", async (req: Request, res: Response) => {
+    const { sender_id, sender_name, recipient_id, message } = req.body;
+  
+    if (!sender_id || !recipient_id) {
+      return res.status(400).json({ error: "Missing sender_id or recipient_id" });
+    }
+  
+    try {
+      // Check if the recipient exists
+      const recipient = await db.get("SELECT * FROM users WHERE user_id = ?", [recipient_id]);
+      if (!recipient) {
+        return res.status(404).json({ error: "Recipient not found" });
+      }
+  
+      // Check if a request already exists
+      const existingRequest = await db.get(
+        "SELECT * FROM friend_requests WHERE sender_id = ? AND user_id = ?",
+        [sender_id, recipient_id]
+      );
+      if (existingRequest) {
+        return res.status(400).json({ error: "Friend request already sent" });
+      }
+  
+      // Insert the friend request
+      await db.run(
+        `INSERT INTO friend_requests (sender_id, sender_name, user_id, message) 
+         VALUES (?, ?, ?, ?)`,
+        [sender_id, sender_name, recipient_id, message || "Hi! Let's connect."]
+      );
+  
+      res.status(200).json({ message: "Friend request sent successfully" });
+    } catch (err) {
+      console.error("Error sending friend request:", err);
+      res.status(500).json({ error: "Failed to send friend request" });
+    }
+  });
   
 }  

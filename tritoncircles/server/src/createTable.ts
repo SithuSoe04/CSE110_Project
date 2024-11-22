@@ -99,7 +99,8 @@ const initDB = async () => {
     VALUES 
       (1, 'Alice', 'alice@example.com', 'password123', 'Engineering', 'CSE', 'AI, Robotics'),
       (2, 'Bob', 'bob@example.com', 'password123', 'Science', 'Physics', 'Quantum Computing'),
-      (3, 'Charlie', 'charlie@example.com', 'password123', 'Arts', 'Literature', 'Writing, Poetry');
+      (3, 'Charlie', 'charlie@example.com', 'password123', 'Arts', 'Literature', 'Writing, Poetry'),
+      (4, 'David', 'david@example.com', 'password123', 'Music', 'Music', 'Composing');
 
     -- Sample data for clubs table
     INSERT INTO clubs (club_id, name, description)
