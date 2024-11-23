@@ -7,8 +7,11 @@ interface Event {
   title: string;
   date: string;
   time: string;
+  room: string;
+  incentives: string;
   courseCode: string;
-  friendId: number; // New field for friend ID
+  friendId: number; 
+  friendName: string;
 }
 
 const FriendsInterestedEvents: React.FC = () => {
@@ -89,10 +92,11 @@ const FriendsInterestedEvents: React.FC = () => {
                 {event.date} - {event.time}
               </Typography>
               <Typography variant="caption" sx={{ display: "block", color: "gray" }}>
-                {event.courseCode}
+                Incentives: {event.incentives}
               </Typography>
+
               <Typography variant="caption" sx={{ display: "block", color: "gray" }}>
-                Friend ID: {event.friendId} {/* Display friend_id */}
+                Friend: {event.friendName} (ID: {event.friendId})
               </Typography>
             </Box>
           </ListItem>

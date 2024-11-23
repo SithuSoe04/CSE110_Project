@@ -50,9 +50,12 @@ export function createFriendsEndpoints(app: any, db: Database) {
       `
       SELECT
         fie.friend_id AS friendId,
+        u.name AS friendName, 
         e.event_id AS id,
         e.title,
         e.date,
+        e.room, 
+        e.incentives, 
         c.name AS clubName
       FROM
         events e
@@ -60,6 +63,8 @@ export function createFriendsEndpoints(app: any, db: Database) {
         friends_interested_events fie ON e.event_id = fie.event_id
       JOIN
         friends f ON f.connection LIKE ? OR f.connection LIKE ?
+      JOIN
+        users u ON u.user_id = fie.friend_id
       JOIN
         clubs c ON e.club_id = c.club_id
       WHERE
