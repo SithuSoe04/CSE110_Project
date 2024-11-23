@@ -34,7 +34,7 @@ const Login = () => {
             }
             const result = await response.json();
             console.log('Login successful:', result);
-            localStorage.setItem('userId', result.userId);
+            localStorage.setItem('user_id', result.user_id);
             setIsAuthenticated(true);
             navigate('/profile');
         }catch(error: any){
