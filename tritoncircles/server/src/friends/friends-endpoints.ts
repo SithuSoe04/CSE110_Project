@@ -82,7 +82,6 @@ export function createFriendsEndpoints(app: any, db: Database) {
     }
   });
 
-
   app.get("/users/search", async (req: Request, res: Response) => {
     const query = req.query.query as string;
   

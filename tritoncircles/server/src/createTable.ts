@@ -116,10 +116,10 @@ const initDB = async () => {
       (3, 2, 'Quantum Physics Meetup', '2024-12-20 16:00:00', 'Physics Building', 'Guest Lectures');
 
     -- Sample data for friend_requests table
-    INSERT INTO friend_requests (sender_id, sender_name, user_id, status, message)
+    INSERT INTO friend_requests (request_id, sender_id, sender_name, user_id, status, message)
     VALUES
-      (1, 'Alice', 3, 'pending', 'Hi Charlie, let us connect!'),
-      (2, 'Bob', 3, 'pending', 'Hi Charlie, looking forward to collaborating!');
+      (1, 1, 'Alice', 3, 'pending', 'Hi Charlie, let us connect!'),
+      (2, 2, 'Bob', 3, 'pending', 'Hi Charlie, looking forward to collaborating!');
 
     -- Sample data for friends table
     INSERT INTO friends (connection, friendship_date)

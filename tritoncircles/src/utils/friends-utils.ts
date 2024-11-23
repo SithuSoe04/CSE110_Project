@@ -41,6 +41,7 @@ export const acceptRequest = async (id: number) => {
   }
 
   try {
+    // console.log("Sending accept request for ID:", id)
     const response = await fetch(`${API_BASE_URL}/friends/requests/${id}/accept`, {
       method: "POST",
       headers: {
@@ -56,7 +57,7 @@ export const acceptRequest = async (id: number) => {
     }
   
     const data = await response.json();
-    console.log("Friend request accepted successfully.");
+    // console.log("Friend request accepted successfully.");
     return data;
   } catch (err) {
     console.error(`Unexpected error:`, err);
@@ -74,6 +75,7 @@ export const declineRequest = async (id: number) => {
   }
 
   try {
+    // console.log("Sending decline request for ID:", id)
     const response = await fetch(`${API_BASE_URL}/friends/requests/${id}`, {
       method: "DELETE",
       headers: {
@@ -89,7 +91,7 @@ export const declineRequest = async (id: number) => {
     }
 
     const data = await response.json();
-    console.log(`Friend request declined.`);
+    // console.log(`Friend request declined.`);
     return data.data || [];
   } catch (err) {
     console.error(`Unexpected error declining friend request:`, err);

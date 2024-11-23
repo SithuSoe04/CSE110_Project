@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { API_BASE_URL } from "../constants/constants";
 import { fetchFriendRequests, acceptRequest, declineRequest, sendFriendRequest } from "../utils/friends-utils";
 
+
 const Friends: React.FC = () => {
   const [showFriendRequests, setShowFriendRequests] = useState(false);
   const [acceptedFriends, setAcceptedFriends] = useState<any[]>([]);
@@ -12,58 +13,142 @@ const Friends: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // New states for search functionality
   const [searchValue, setSearchValue] = useState<string>("");
   const [searchResult, setSearchResult] = useState<any | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const cachedRequests = JSON.parse(localStorage.getItem("friend_requests") || "[]");
-        if (cachedRequests.length > 0) {
-          setFriendRequests(cachedRequests);
-        } else {
-          const friends = await fetchFriendRequests();
-          setFriendRequests(friends || []);
-        }
-      } catch (err) {
-        console.error("Error fetching friend requests:", err);
-        setError("Failed to load requests.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-  
 
-  const handleAccept = async (request: any) => {
+  const fetchData = async () => {
     try {
-      await acceptRequest(request.request_id); // Use the correct property (request_id)
-      setAcceptedFriends((prev) => [...prev, request]);
-      setFriendRequests((prev) =>
-        prev.filter((req) => req.request_id !== request.request_id) // Filter out the accepted request
-      );
+      setLoading(true);
+      setError(null);
+      const requests = await fetchFriendRequests();
+      setFriendRequests(requests || []);
+      const accepted = requests.filter((req: any) => req.status === "accepted");
+      setAcceptedFriends(accepted || []);
     } catch (err) {
-      console.error("Error accepting friend request:", err);
+      console.error("Error fetching friend requests:", err);
+      setError("Failed to load friend requests. Please try again later.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleDecline = async (request: any) => {
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  // const handleAccept = async (request: any) => {
+  //   console.log("Accept request with ID:", request.request_id); // Debug log
+  //   try {
+  //     await acceptRequest(request.request_id); // Use request_id here
+  //     await fetchData(); // Refresh the data
+  //   } catch (err) {
+  //     console.error("Error accepting friend request:", err);
+  //     setError("Failed to accept friend request. Please refresh and try again.");
+  //   }
+  // };
+   
+  // const handleDecline = async (request: any) => {
+  //   console.log("Decline request with ID:", request.request_id); // Debug log
+  //   try {
+  //     await declineRequest(request.request_id); // Use request_id here
+  //     await fetchData(); // Refresh the data
+  //   } catch (err) {
+  //     console.error("Error declining friend request:", err);
+  //     setError("Failed to decline friend request. Please refresh and try again.");
+  //   }
+  // };
+
+  const handleAccept = async (request: any) => {
+    // console.log("Accept request with ID:", request.request_id); // Debug log
     try {
-      await declineRequest(request.request_id); // Use the correct property (request_id)
+      await acceptRequest(request.request_id);
+  
+      // Update frontend state immediately
+      setFriendRequests((prev) =>
+        prev.filter((req) => req.request_id !== request.request_id)
+      );
+      setAcceptedFriends((prev) => [...prev, { ...request, status: "accepted" }]);
+  
+      console.log("Friend request accepted successfully.");
+    } catch (err) {
+      console.error("Error accepting friend request:", err);
+      setError("Failed to accept friend request. Please refresh and try again.");
+    }
+  };
+  
+ 
+  const handleDecline = async (request: any) => {
+    // console.log("Decline request with ID:", request.request_id); // Debug log
+    try {
+      await declineRequest(request.request_id);
+  
+      // Update frontend state immediately
       setFriendRequests((prev) =>
         prev.map((req) =>
           req.request_id === request.request_id
-            ? { ...req, declined: true }
+            ? { ...req, status: "declined", declined: true }
             : req
         )
       );
+  
+      console.log("Friend request declined.");
     } catch (err) {
       console.error("Error declining friend request:", err);
+      setError("Failed to decline friend request. Please refresh and try again.");
     }
   };
+  
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const cachedRequests = JSON.parse(localStorage.getItem("friend_requests") || "[]");
+  //       if (cachedRequests.length > 0) {
+  //         setFriendRequests(cachedRequests);
+  //       } else {
+  //         const friends = await fetchFriendRequests();
+  //         setFriendRequests(friends || []);
+  //       }
+  //     } catch (err) {
+  //       console.error("Error fetching friend requests:", err);
+  //       setError("Failed to load requests.");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchData();
+  // }, []);
+
+
+  // const handleAccept = async (request: any) => {
+  //   try {
+  //     await acceptRequest(request.request_id); // Use the correct property (request_id)
+  //     setAcceptedFriends((prev) => [...prev, request]);
+  //     setFriendRequests((prev) =>
+  //       prev.filter((req) => req.request_id !== request.request_id) // Filter out the accepted request
+  //     );
+  //   } catch (err) {
+  //     console.error("Error accepting friend request:", err);
+  //   }
+  // };
+ 
+  // const handleDecline = async (request: any) => {
+  //   try {
+  //     await declineRequest(request.request_id); // Use the correct property (request_id)
+  //     setFriendRequests((prev) =>
+  //       prev.map((req) =>
+  //         req.request_id === request.request_id
+  //           ? { ...req, declined: true }
+  //           : req
+  //       )
+  //     );
+  //   } catch (err) {
+  //     console.error("Error declining friend request:", err);
+  //   }
+  // };
+
 
   const handleSearch = async () => {
     setSearchError(null);
@@ -233,9 +318,13 @@ const Friends: React.FC = () => {
                     </Box>
                   </Box>
                   <Box>
-                    {request.declined ? (
+                    {request.status === "declined" ? (
                       <Typography variant="body2" color="error">
                         Declined
+                      </Typography>
+                    ) : request.status === "accepted" ? (
+                      <Typography variant="body2" color="primary">
+                        Accepted
                       </Typography>
                     ) : (
                       <>
@@ -260,6 +349,7 @@ const Friends: React.FC = () => {
                     )}
                   </Box>
                 </ListItem>
+
               ))
             )}
           </List>
@@ -311,6 +401,7 @@ const Friends: React.FC = () => {
       )}
     </Box>
   );
+
 };
 
 export default Friends;
