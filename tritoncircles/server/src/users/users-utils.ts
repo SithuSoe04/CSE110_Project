@@ -50,7 +50,7 @@ export async function userLogIn(req: Request, res: Response, db: Database) {
         }
         const match = await bcrypt.compare(password, currentUser.password);
         if (match) {
-            res.status(200).send({message: "Logged in successfully"});
+            res.status(200).send({message: "Logged in successfully", user_id: currentUser.user_id});
         } else {
             res.status(401).send({messsage: 'Username or password does not match'})
         }

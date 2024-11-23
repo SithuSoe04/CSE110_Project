@@ -5,7 +5,7 @@ import logo from "../assets/logo.png";
 import {useAuth} from '../context/AuthContext';
 
 const Login = () => {
-    const [credentials, setCredentials] = useState({email: '', password: ''});
+    const [credentials, setCredentials] = useState({email: '', password: '', user_id: ''});
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
 
@@ -28,15 +28,18 @@ const Login = () => {
                 },
                 body: JSON.stringify(credentials),
             });
-            if(!response.ok){
+            if(response.ok){
+                const result = await response.json();
+                console.log('Login successful:', result);
+                localStorage.setItem('user_id', result.user_id);
+                setIsAuthenticated(true);
+                navigate('/profile');
+            }
+            else{
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Login failed');
             }
-            const result = await response.json();
-            console.log('Login successful:', result);
-            localStorage.setItem('user_id', result.user_id);
-            setIsAuthenticated(true);
-            navigate('/profile');
+            
         }catch(error: any){
             console.error('Error during login:', error.message);
             setError(error.message);
