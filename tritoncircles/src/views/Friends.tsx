@@ -109,7 +109,7 @@ const Friends: React.FC = () => {
     }
   };
 
-  
+
   const handleSendRequest = async (recipientId: string) => {
     try {
       await sendFriendRequest(recipientId);
@@ -132,14 +132,14 @@ const Friends: React.FC = () => {
 
   return (
     <Box sx={{ padding: "20px" }}>
-      <Typography variant="h4" sx={{ color: "gray", mb: 2 }}>
+      <Typography variant="h4" sx={{ color: "black", mb: 2 }}>
         Friends
       </Typography>
 
       {/* Search Bar */}
       <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
         <TextField fullWidth 
-        placeholder="Search" 
+        placeholder="Search by username or user ID" 
         variant="outlined" 
         value={searchValue}
         onChange={(e) => setSearchValue(e.target.value)}
