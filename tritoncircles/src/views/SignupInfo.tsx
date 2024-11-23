@@ -27,7 +27,7 @@ const SignupInfo: React.FC =() => {
             return;
         }
         try{
-            const response=await fetch('http://localhost:8102/updateUserInfo', {
+            const response=await fetch('http://localhost:8080/updateUserInfo', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
