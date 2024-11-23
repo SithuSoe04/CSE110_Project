@@ -56,26 +56,24 @@ const initDB = async () => {
     CREATE TABLE IF NOT EXISTS friend_requests (
       request_id INTEGER PRIMARY KEY AUTOINCREMENT,
       sender_id INTEGER NOT NULL,
-      receiver_id INTEGER NOT NULL,
-      status VARCHAR(20) DEFAULT 'pending', -- 'pending', 'accepted', or 'declined'
+      sender_name VARCHAR(50),
+      user_id INTEGER NOT NULL,
+      status VARCHAR(20) DEFAULT 'pending', 
       message TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY(sender_id) REFERENCES users(user_id) ON DELETE CASCADE,
-      FOREIGN KEY(receiver_id) REFERENCES users(user_id) ON DELETE CASCADE
+      FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+      UNIQUE(sender_id, user_id) 
     );
 
     CREATE TABLE IF NOT EXISTS friends (
-      user1_id INTEGER NOT NULL,
-      user2_id INTEGER NOT NULL,
-      friendship_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY(user1_id) REFERENCES users(user_id) ON DELETE CASCADE,
-      FOREIGN KEY(user2_id) REFERENCES users(user_id) ON DELETE CASCADE,
-      PRIMARY KEY(user1_id, user2_id)
-    );
+      connection VARCHAR(255) PRIMARY KEY, -- Combined user_id and friend_id
+      friendship_date DATETIME DEFAULT CURRENT_TIMESTAMP
+    );      
 
     CREATE TABLE IF NOT EXISTS friends_interested_events (
       friend_id INTEGER NOT NULL,
       event_id INTEGER NOT NULL,
-      interested_date DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY(friend_id) REFERENCES users(user_id) ON DELETE CASCADE,
       FOREIGN KEY(event_id) REFERENCES events(event_id) ON DELETE CASCADE,
       PRIMARY KEY(friend_id, event_id)

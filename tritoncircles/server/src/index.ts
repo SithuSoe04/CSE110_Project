@@ -1,8 +1,9 @@
 import express, { Request, Response } from "express";
 import initDB from "./createTable";
 import { createUserEndpoints } from "./users/users-endpoints";
-// import { createFriendsEndpoints } from "./friends/friends-endpoints";
 import { createEventEndpoints } from './events/events-endpoints';
+import { createFriendsEndpoints } from "./friends/friends-endpoints";
+
 
 const cors = require('cors');
 const app = express();
@@ -129,7 +130,7 @@ interface FavoriteRequest {
     // Initialize other endpoints
     createEventEndpoints(app, db);
     createUserEndpoints(app, db);
-    // createFriendsEndpoints(app, db);
+    createFriendsEndpoints(app, db);
 
     // Start the server
     app.listen(port, () => {
