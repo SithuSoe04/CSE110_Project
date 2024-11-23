@@ -96,7 +96,7 @@ const FriendsInterestedEvents: React.FC = () => {
               </Typography>
 
               <Typography variant="caption" sx={{ display: "block", color: "gray" }}>
-                Friend: {event.friendName} (ID: {event.friendId})
+                Friend: {event.friendName} ({event.friendId})
               </Typography>
             </Box>
           </ListItem>
