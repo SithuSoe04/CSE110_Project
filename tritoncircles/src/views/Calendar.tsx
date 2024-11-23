@@ -17,6 +17,8 @@ import {
   Computer,
 } from "@mui/icons-material";
 
+import { API_BASE_URL } from "../constants/constants";
+
 interface Event {
   event_id: number;
   club_id: number;
@@ -42,12 +44,11 @@ const CalendarPage: React.FC = () => {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/events", {
+      const response = await fetch(`${API_BASE_URL}/events`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", // if using sessions
       });
       if (!response.ok) {
         throw new Error("Failed to fetch events");

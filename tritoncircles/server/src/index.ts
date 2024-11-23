@@ -1,24 +1,14 @@
 import express, { Request, Response } from "express";
-import { Request, Response } from "express";
-import { budget } from "./constants";
 import initDB from "./createTable";
 import { createUserEndpoints } from "./users/users-endpoints";
 // import { createFriendsEndpoints } from "./friends/friends-endpoints";
 import { createEventEndpoints } from './events/events-endpoints';
 
 const cors = require('cors');
-import { seedEvents } from './events/testEvents';
-
-const express = require("express");
-const cors = require("cors");
-
 const app = express();
-const port = 8102;
+const port = 8080;
 
-app.use(cors({
-    origin: 'http://localhost:3000', // your frontend URL
-    credentials: true
-  }));
+app.use(cors());
 app.use(express.json());
 
 interface FavoriteRequest {
@@ -154,16 +144,6 @@ interface FavoriteRequest {
     console.error("Startup error:", error);
     process.exit(1);
   }
-// Seed test events
-await seedEvents(db);
-
- // Root endpoint to get test if the server is running
- app.get("/", (req: Request, res: Response) => {
-   res.status(200).send({ "data": "Hello, TypeScript Express!" });
- });
-
- createUserEndpoints(app, db);
- createEventEndpoints(app, db);
 })();
 
 export default app;

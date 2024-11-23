@@ -17,11 +17,11 @@ const Login = () => {
 
     const {setIsAuthenticated} = useAuth();
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        event. preventDefault();
+        event.preventDefault();
 
         console.log('Attempting to log in with:', credentials);
         try{
-            const response = await fetch('http://localhost:8102/login', {
+            const response = await fetch('http://localhost:8080/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

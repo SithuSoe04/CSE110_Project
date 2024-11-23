@@ -34,7 +34,7 @@ const Signup: React.FC = () => {
         console.log("Submitting data:", JSON.stringify(userData));
 
         try{
-            const response = await fetch('http://localhost:8102/signup', {
+            const response = await fetch('http://localhost:8080/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
