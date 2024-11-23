@@ -20,9 +20,9 @@ const SignupInfo: React.FC =() => {
     const {setIsAuthenticated} = useAuth();
     const handleSubmit = async (event:React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const userId = localStorage.getItem('userID');
-        console.log('Retrieved userID in SignupInfo:', userId);
-        if(!userId){
+        const user_id = localStorage.getItem('user_id');
+        console.log('Retrieved userID in SignupInfo:', user_id);
+        if(!user_id){
             console.error('No user ID found');
             return;
         }
@@ -33,7 +33,7 @@ const SignupInfo: React.FC =() => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    userId: userId,
+                    user_id: user_id,
                     ...userInfo
                 })
             });

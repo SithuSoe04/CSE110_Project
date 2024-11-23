@@ -52,8 +52,8 @@ const Signup: React.FC = () => {
             }
             const result = await response.json();
             console.log('Signup successful:', result);
-            localStorage.setItem('userID', result.userID);
-            console.log('Stored userId in localStorage:', localStorage.getItem('userID'));
+            localStorage.setItem('user_id', result.user_id);
+            console.log('Stored user_id in localStorage:', localStorage.getItem('user_id'));
             navigate('/signup-info');
         }catch (error){
             console.error('Error during signup:', error);

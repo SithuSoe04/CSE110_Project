@@ -15,20 +15,20 @@ export async function userSignUp(req: Request, res: Response, db: Database) {
         const hashedPassword = await bcrypt.hash(password, 10);
         await db.run('INSERT INTO users (name, email, password) VALUES (?, ?, ?);', [name, email, hashedPassword]);
         const newUser = await db.get('SELECT user_id FROM users WHERE email = ?', [email]);
-        res.status(201).json({ message: "User registered successfully", userID: newUser.user_id });
+        res.status(201).json({ message: "User registered successfully", user_id: newUser.user_id });
     } catch (error) {
         return res.status(500).send({error: `Error registering user: ${error}`});
     };
 }
 
 export async function updateUserProfile(req: Request, res: Response, db: Database){
-    const { userId, college, major, year, minor} = req.body as {userId: number, college?: string, major?: string, year?: string, minor?: string};
+    const { user_id, college, major, year, minor} = req.body as {user_id: number, college?: string, major?: string, year?: string, minor?: string};
     console.log('Received updateUserProfile request:', req.body);
-    if(!userId){
+    if(!user_id){
         return res.status(400).send({error:"Missing required user ID"});
     }
     try{
-        const result = await db.run('UPDATE users SET college = ?, major = ?, year = ?, minor = ? WHERE user_id = ?;', [college || null, major || null, year || null, minor || null, userId]);
+        const result = await db.run('UPDATE users SET college = ?, major = ?, year = ?, minor = ? WHERE user_id = ?;', [college || null, major || null, year || null, minor || null, user_id]);
         console.log('Update result:', result);
         res.status(200).send({message:"Profile updated successfully"});
     }
