@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import EventCard from "../components/Events/EventCard";
 import {
   Box,
@@ -6,32 +6,29 @@ import {
   IconButton,
   Grid,
   Paper,
-  Card,
-  CardContent,
-  Chip,
   Button,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import {
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
-  Computer,
 } from "@mui/icons-material";
-
 import { API_BASE_URL } from "../constants/constants";
 
 interface Event {
   event_id: number;
   club_id: number;
   title: string;
-  date: string;
+  date: Date;
   room: string;
-  incentives?: string;
-  // Adding computed properties for UI
+  incentives: string[];
   club?: string;
   time?: string;
   attending?: number;
   tags?: string[];
   favorite?: boolean;
+  notified?: boolean;
 }
 
 const CalendarPage: React.FC = () => {
@@ -40,8 +37,16 @@ const CalendarPage: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showNotification, setShowNotification] = useState(false);
+  const [notifications, setNotifications] = useState<
+    {
+      id: number;
+      message: string;
+      acknowledged: boolean;
+    }[]
+  >([]);
 
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`${API_BASE_URL}/events`, {
@@ -50,25 +55,23 @@ const CalendarPage: React.FC = () => {
           "Content-Type": "application/json",
         },
       });
+
       if (!response.ok) {
         throw new Error("Failed to fetch events");
       }
+
       const data = await response.json();
 
-      // Transform the API data to match our UI needs
       const transformedEvents = data.data.map((event: Event) => ({
         ...event,
-        // Convert the date string to a Date object for easier comparison
         date: new Date(event.date),
-        // Extract time from the date string (might need to adjust this based on date format)
         time: new Date(event.date).toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
         }),
-        // Add default values for UI elements
         club: `Club ${event.club_id}`,
         attending: 0,
-        tags: event.incentives ? [event.incentives] : [],
+        tags: Array.isArray(event.incentives) ? event.incentives : [],
       }));
 
       setEvents(transformedEvents);
@@ -79,11 +82,58 @@ const CalendarPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  const checkUpcomingEvents = useCallback(() => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+
+    const upcomingEvents = events.filter((event) => {
+      const eventDate = new Date(event.date);
+      eventDate.setHours(0, 0, 0, 0);
+      return eventDate.getTime() === tomorrow.getTime() && !event.notified;
+    });
+
+    if (upcomingEvents.length > 0) {
+      const newNotifications = upcomingEvents.map((event) => ({
+        id: event.event_id,
+        message: `Reminder: "${event.title}" is tomorrow at ${event.time}`,
+        acknowledged: false,
+      }));
+
+      setNotifications((prev) => [...prev, ...newNotifications]);
+
+      setEvents((prev) =>
+        prev.map((event) =>
+          upcomingEvents.some((e) => e.event_id === event.event_id)
+            ? { ...event, notified: true }
+            : event
+        )
+      );
+    }
+  }, [events]);
+
+  const handleDismissNotification = (id: number) => {
+    setNotifications((prev) =>
+      prev.filter((notification) => notification.id !== id)
+    );
+  };
+
+  const handleAcknowledgeAll = () => {
+    setNotifications([]);
   };
 
   useEffect(() => {
     fetchEvents();
-  }, []);
+  }, [fetchEvents]);
+
+  useEffect(() => {
+    checkUpcomingEvents();
+    const interval = setInterval(checkUpcomingEvents, 3600000); // Check every hour
+
+    return () => clearInterval(interval);
+  }, [checkUpcomingEvents]);
 
   // Monthly view functions
   const getPreviousMonthDays = (year: number, month: number): number[] => {
@@ -439,6 +489,42 @@ const CalendarPage: React.FC = () => {
           )}
         </Grid>
       </Grid>
+      {notifications.map((notification) => (
+        <Snackbar
+          key={notification.id}
+          open={true}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          sx={{
+            position: "fixed",
+            mt: notifications.indexOf(notification) * 80, // Stack notifications vertically
+          }}
+        >
+          <Alert
+            severity="info"
+            sx={{
+              width: "100%",
+              backgroundColor: "#fff",
+              border: "1px solid #2196f3",
+              "& .MuiAlert-message": {
+                flex: 1,
+              },
+            }}
+            action={
+              <Box sx={{ display: "flex", gap: 1 }}>
+                <Button
+                  color="primary"
+                  size="small"
+                  onClick={() => handleDismissNotification(notification.id)}
+                >
+                  Dismiss
+                </Button>
+              </Box>
+            }
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      ))}
     </Box>
   );
 };
