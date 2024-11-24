@@ -96,21 +96,28 @@ const CalendarPage: React.FC = () => {
     });
 
     if (upcomingEvents.length > 0) {
-      const newNotifications = upcomingEvents.map((event) => ({
-        id: event.event_id,
-        message: `Reminder: "${event.title}" is tomorrow at ${event.time}`,
-        acknowledged: false,
-      }));
+      // Clear existing notifications first
+      setNotifications([]);
 
-      setNotifications((prev) => [...prev, ...newNotifications]);
+      const newNotifications = upcomingEvents
+        .filter((event) => !event.notified) // Only add if not already notified
+        .map((event) => ({
+          id: event.event_id,
+          message: `Reminder: "${event.title}" is tomorrow at ${event.time}`,
+          acknowledged: false,
+        }));
 
-      setEvents((prev) =>
-        prev.map((event) =>
-          upcomingEvents.some((e) => e.event_id === event.event_id)
-            ? { ...event, notified: true }
-            : event
-        )
-      );
+      if (newNotifications.length > 0) {
+        setNotifications(newNotifications); // Replace instead of append
+
+        setEvents((prev) =>
+          prev.map((event) =>
+            upcomingEvents.some((e) => e.event_id === event.event_id)
+              ? { ...event, notified: true }
+              : event
+          )
+        );
+      }
     }
   }, [events]);
 
@@ -118,10 +125,6 @@ const CalendarPage: React.FC = () => {
     setNotifications((prev) =>
       prev.filter((notification) => notification.id !== id)
     );
-  };
-
-  const handleAcknowledgeAll = () => {
-    setNotifications([]);
   };
 
   useEffect(() => {
