@@ -6,9 +6,11 @@ import Grid from "@mui/material/Grid2";
 import { Typography } from "@mui/material";
 import FAQ from "../components/FAQ/FAQ";
 import { fetchFavoriteEvents } from "../utils/events-utils";
+import { fetchUserRecruitmentPosts } from "../utils/recruitment-utils";
 
 const Home = () => {
   const [favoriteEventsData, setFavoriteEventsData] = useState<{id: number, club: string, club_name: string, title: string, date: string, room: string, incentives: string[], favorite: boolean}[]>([]);
+  const [recruitmentData, setRecruitmentData] = useState<{id: number, club: string, club_name: string, title: string, date_posted: string, deadline: string, application_link: string}[]>([])
   useEffect(() => {
     const fetchData = async () => {
       try{
@@ -21,6 +23,12 @@ const Home = () => {
             incentives: JSON.parse(event.incentives)}));
         setFavoriteEventsData(newFavoriteEvents);
         console.log(favoriteEventsData);
+        const recruitmentPosts = await fetchUserRecruitmentPosts();
+        const newRecruitmentPosts = recruitmentPosts.map((recruitment: any) => ({...recruitment,
+          id: recruitment.recruitment_id,
+          club: recruitment.club_id,
+        }))
+        setRecruitmentData(newRecruitmentPosts);
       }
       catch (error){
         console.error("Error fetching events:", error);
@@ -28,39 +36,6 @@ const Home = () => {
     };
     fetchData()
   }, [])
-  const recruitmentData = [
-    {
-        id: 1,
-        club: "CSES",
-        position: "Marketing Director",
-        date_posted: "3 Nov 2024",
-        deadline: "12 Nov 2024",
-        application_link: "https://www.google.com/"
-    },
-    {
-        id: 2,
-        club: "CSES",
-        position: "Marketing Director",
-        date_posted: "3 Nov 2024",
-        deadline: "12 Nov 2024",
-        application_link: "https://www.google.com/"
-    },
-    {
-        id: 3,
-        club: "CSES",
-        position: "Marketing Director",
-        date_posted: "3 Nov 2024",
-        deadline: "12 Nov 2024",
-        application_link: "https://www.google.com/"
-    },
-    {
-        id: 4,
-        club: "CSES",
-        position: "Marketing Director",
-        date_posted: "3 Nov 2024",
-        deadline: "12 Nov 2024",
-        application_link: "https://www.google.com/"
-    }]
     return (
       <Box sx={{ flexGrow: 1, margin: "3rem" }}>
         <Typography gutterBottom variant="h4">
@@ -77,7 +52,7 @@ const Home = () => {
         </Typography>
         <Grid container spacing={2} mb={5}>
           {recruitmentData.map(data => 
-             <Grid size={3}><Recruitment id={data.id} club={data.club} position={data.position} date_posted={data.date_posted} deadline={data.deadline} application_link={data.application_link}/></Grid>
+             <Grid size={3}><Recruitment id={data.id} club={data.club_name} position={data.title} date_posted={data.date_posted} deadline={data.deadline} application_link={data.application_link}/></Grid>
           )}
         </Grid> 
         <Typography gutterBottom variant="h4">
