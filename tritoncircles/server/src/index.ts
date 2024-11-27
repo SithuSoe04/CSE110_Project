@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import initDB from "./createTable";
 import { createUserEndpoints } from "./users/users-endpoints";
+import { createEventEndpoints } from "./events/events-endpoints";
 import { createEventEndpoints } from './events/events-endpoints';
 import { createFriendsEndpoints } from "./friends/friends-endpoints";
 import { createRecruitmentEndpoints } from "./recruitment/recruitment-endpoints";
@@ -24,18 +25,23 @@ interface FavoriteRequest {
     const db = await initDB();
     console.log("Database initialized successfully");
 
-    // Root endpoint to get test if the server is running
+    // Root endpoint to test if the server is running
     app.get("/", (req: Request, res: Response) => {
-      res.send({ "data": "Hello, TypeScript Express!" });
+      res.send({ data: "Hello, TypeScript Express!" });
       res.status(200);
     });
 
-    // Club endpoints
+    // Fetch all clubs
     app.get("/api/clubs", async (req: Request, res: Response): Promise<void> => {
       try {
-        const userId = 1;
-        
-        const clubs = await db.all(`
+        const userId = parseInt(req.query.userId as string, 10); // Retrieve userId from query parameters
+        if (!userId) {
+          res.status(400).json({ error: "Missing userId query parameter" });
+          return; // Add a return here to stop further execution
+        }
+    
+        const clubs = await db.all(
+          `
           SELECT 
             c.*,
             CASE WHEN cf.user_id IS NOT NULL THEN 1 ELSE 0 END as favorite
@@ -43,21 +49,28 @@ interface FavoriteRequest {
           LEFT JOIN club_favorites cf 
             ON c.club_id = cf.club_id 
             AND cf.user_id = ?
-        `, [userId]);
-        
-        console.log("Fetched clubs:", clubs);
-        res.json({ clubs });
+          `,
+          [userId]
+        );
+    
+        res.json({ clubs }); // Correctly returning JSON response
       } catch (error) {
         console.error("Error fetching clubs:", error);
         res.status(500).json({ error: "Failed to fetch clubs" });
       }
     });
 
+    // Fetch favorite clubs
     app.get("/api/clubs/favorites", async (req: Request, res: Response): Promise<void> => {
       try {
-        const userId = 1; // Default user ID for testing
-        
-        const favorites = await db.all(`
+        const userId = Number(req.query.userId);
+        if (!userId) {
+          res.status(400).json({ error: "Missing or invalid userId" });
+          return;
+        }
+
+        const favorites = await db.all(
+          `
           SELECT 
             c.*,
             1 as favorite
@@ -65,8 +78,10 @@ interface FavoriteRequest {
           INNER JOIN club_favorites cf 
             ON c.club_id = cf.club_id 
           WHERE cf.user_id = ?
-        `, [userId]);
-        
+        `,
+          [userId]
+        );
+
         console.log("Fetched favorites:", favorites);
         res.json({ favorites });
       } catch (error) {
@@ -75,55 +90,50 @@ interface FavoriteRequest {
       }
     });
 
+    // Toggle favorite status
     app.post("/api/clubs/favorite", async (req: Request, res: Response): Promise<void> => {
       try {
-        console.log("Received favorite toggle request");
-        console.log("Request body:", req.body);
         const { userId, clubId } = req.body as FavoriteRequest;
 
         if (!userId || !clubId) {
-          res.status(400).json({ 
+          res.status(400).json({
             error: "Missing required fields",
-            received: { userId, clubId }
+            received: { userId, clubId },
           });
           return;
         }
 
-        // Check if favorite exists
         const favorite = await db.get(
           "SELECT * FROM club_favorites WHERE user_id = ? AND club_id = ?",
           [userId, clubId]
         );
-        console.log("Current favorite status:", favorite);
 
         if (favorite) {
-          console.log("Removing favorite");
           await db.run(
             "DELETE FROM club_favorites WHERE user_id = ? AND club_id = ?",
             [userId, clubId]
           );
-          res.json({ 
-            success: true, 
+          res.json({
+            success: true,
             favorite: false,
-            message: "Removed from favorites"
+            message: "Removed from favorites",
           });
         } else {
-          console.log("Adding favorite");
           await db.run(
             "INSERT INTO club_favorites (user_id, club_id) VALUES (?, ?)",
             [userId, clubId]
           );
-          res.json({ 
-            success: true, 
+          res.json({
+            success: true,
             favorite: true,
-            message: "Added to favorites"
+            message: "Added to favorites",
           });
         }
       } catch (error) {
         console.error("Error toggling favorite:", error);
-        res.status(500).json({ 
+        res.status(500).json({
           error: "Failed to update favorite status",
-          details: error instanceof Error ? error.message : "Unknown error"
+          details: error instanceof Error ? error.message : "Unknown error",
         });
       }
     });
@@ -142,7 +152,6 @@ interface FavoriteRequest {
       console.log("- GET  /api/clubs/favorites  (get favorite clubs)");
       console.log("- POST /api/clubs/favorite   (toggle favorite status)");
     });
-
   } catch (error) {
     console.error("Startup error:", error);
     process.exit(1);
