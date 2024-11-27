@@ -8,6 +8,18 @@ const initDB = async () => {
     driver: sqlite3.Database,
   });
 
+  // await db.exec(`
+  //   DELETE FROM users;
+  //   DELETE FROM events;
+  //   DELETE FROM clubs;
+  //   DELETE FROM event_favorites;
+  //   DELETE FROM club_favorites;
+  //   DELETE FROM friend_requests;
+  //   DELETE FROM friends;
+  //   DELETE FROM friends_interested_events;
+  // `);
+
+
   await db.exec(`
    CREATE TABLE IF NOT EXISTS users (
       user_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -91,24 +103,11 @@ const initDB = async () => {
     );
   `);
 
-  // Seed the clubs table if it's empty
-  // const existingClubs = await db.all("SELECT * FROM clubs");
-  // if (existingClubs.length === 0) {
-  //   await db.exec(`
-  //     INSERT INTO clubs (name, description, link) VALUES
-  //     ('Active Minds Club', 'Promoting mental health awareness.', 'https://studentorg.ucsd.edu/Home/Details/17085'),
-  //     ('Anime and Manga Club', 'Anime and Manga enthusiasts.', 'https://studentorg.ucsd.edu/Home/Details/16945'),
-  //     ('Badminton Club', 'For badminton lovers.', 'https://studentorg.ucsd.edu/Home/Details/17188'),
-  //     ('ACM', 'Computer science and engineering club.', 'https://studentorg.ucsd.edu/Home/Details/16973');
-  //   `);
-  //   console.log("Seeded clubs table with initial data");
-  // }
-
   // Log tables created
   console.log("Database initialized with tables:");
   const tables = await db.all("SELECT name FROM sqlite_master WHERE type='table'");
   tables.forEach(table => console.log(`- ${table.name}`));
-  
+
   return db;
 };
 
