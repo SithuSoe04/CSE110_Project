@@ -9,6 +9,8 @@ import {
   Button,
   Snackbar,
   Alert,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import {
   ChevronLeft as ChevronLeftIcon,
@@ -45,6 +47,9 @@ const CalendarPage: React.FC = () => {
       acknowledged: boolean;
     }[]
   >([]);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md")); // md = 900px
 
   const fetchEvents = useCallback(async () => {
     try {
@@ -273,10 +278,16 @@ const CalendarPage: React.FC = () => {
     const endDate = new Date(startDate);
     endDate.setDate(startDate.getDate() + 6);
 
-    return events.filter((event) => {
-      const eventDate = new Date(event.date);
-      return eventDate >= startDate && eventDate <= endDate;
-    });
+    return events
+      .filter((event) => {
+        const eventDate = new Date(event.date);
+        return eventDate >= startDate && eventDate <= endDate;
+      })
+      .sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return dateA.getTime() - dateB.getTime();
+      });
   };
 
   if (loading) {
@@ -311,9 +322,9 @@ const CalendarPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3, maxWidth: 1400, margin: "0 auto", mt: 8 }}>
-      <Grid container spacing={3}>
-        {/* Left Column - Calendar */}
-        <Grid item xs={8}>
+      <Grid container spacing={3} direction={isMobile ? "column" : "row"}>
+        {/* Calendar */}
+        <Grid item xs={12} md={8}>
           {/* Calendar Header */}
           <Box
             sx={{
@@ -348,38 +359,50 @@ const CalendarPage: React.FC = () => {
                 alignItems: "center",
               }}
             >
-              <Grid container spacing={1} sx={{ maxWidth: 700 }}>
+              <Grid container spacing={0.5} sx={{ maxWidth: 500 }}>
                 {/* Day headers */}
                 {days.map((day) => (
-                  <Grid item xs={1} key={day} sx={{ textAlign: "center" }}>
+                  <Grid
+                    item
+                    xs={12 / 7}
+                    key={day}
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
                     <Typography sx={{ fontWeight: "bold" }}>{day}</Typography>
                   </Grid>
                 ))}
 
                 {/* Calendar days */}
                 {getCalendarDays(date).map((week, weekIndex) => (
-                  <Grid container item spacing={1} key={weekIndex}>
+                  <Grid container item spacing={0} key={weekIndex}>
                     {week.map(({ day, isCurrentMonth }, dayIndex) => (
                       <Grid
                         item
-                        xs={1}
+                        xs={12 / 7}
                         key={dayIndex}
-                        sx={{ textAlign: "center" }}
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          py: 0.5,
+                        }}
                       >
                         <Paper
                           elevation={0}
                           sx={{
-                            p: 1,
                             backgroundColor: isToday(day, isCurrentMonth)
                               ? "#e3f2fd"
                               : "transparent",
                             borderRadius: "50%",
-                            width: 40,
-                            height: 40,
+                            width: 36,
+                            height: 36,
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            margin: "0 auto",
                             position: "relative",
                             opacity: isCurrentMonth ? 1 : 0.4,
                             cursor: "pointer",
@@ -443,51 +466,83 @@ const CalendarPage: React.FC = () => {
         </Grid>
 
         {/* Right Column - Upcoming Events */}
-        <Grid item xs={4}>
+        <Grid item xs={12} md={4}>
           {clickedDate && (
             <Paper elevation={2} sx={{ p: 3, backgroundColor: "#fff" }}>
-              <Typography variant="h6" sx={{ mb: 1 }}>
-                Upcoming Events
-              </Typography>
-              <Typography
-                variant="subtitle1"
-                color="textSecondary"
-                sx={{ mb: 2 }}
+              {/* Fixed Header */}
+              <Box
+                sx={{
+                  position: "sticky",
+                  top: 0,
+                  backgroundColor: "#fff",
+                  pb: 2,
+                }}
               >
-                {clickedDate.toLocaleDateString()} -{" "}
-                {new Date(
-                  new Date(clickedDate).setDate(clickedDate.getDate() + 6)
-                ).toLocaleDateString()}
-              </Typography>
-              {getEventsInRange(clickedDate, events).length > 0 ? (
-                getEventsInRange(clickedDate, events).map((event) => (
-                  <EventCard
-                    key={event.event_id}
-                    id={event.event_id}
-                    club={event.club || ""}
-                    title={event.title}
-                    date={new Date(event.date).toDateString()}
-                    room={event.room}
-                    favorite={event.favorite || false}
-                    incentives={
-                      Array.isArray(event.incentives) ? event.incentives : []
-                    }
-                    toggleFavorite={(id) => {
-                      setEvents((prevEvents) =>
-                        prevEvents.map((e) =>
-                          e.event_id === id
-                            ? { ...e, favorite: !e.favorite }
-                            : e
-                        )
-                      );
-                    }}
-                  />
-                ))
-              ) : (
-                <Typography color="textSecondary">
-                  No upcoming events for this week
+                <Typography variant="h6" sx={{ mb: 1 }}>
+                  Upcoming Events
                 </Typography>
-              )}
+                <Typography
+                  variant="subtitle1"
+                  color="textSecondary"
+                  sx={{ mb: 2 }}
+                >
+                  {clickedDate.toLocaleDateString()} -{" "}
+                  {new Date(
+                    new Date(clickedDate).setDate(clickedDate.getDate() + 6)
+                  ).toLocaleDateString()}
+                </Typography>
+              </Box>
+
+              {/* Scrollable Content */}
+              <Box
+                sx={{
+                  maxHeight: "60vh",
+                  overflowY: "auto",
+                  "&::-webkit-scrollbar": {
+                    width: "8px",
+                  },
+                  "&::-webkit-scrollbar-track": {
+                    background: "#f1f1f1",
+                  },
+                  "&::-webkit-scrollbar-thumb": {
+                    background: "#888",
+                    borderRadius: "4px",
+                  },
+                  "&::-webkit-scrollbar-thumb:hover": {
+                    background: "#555",
+                  },
+                }}
+              >
+                {getEventsInRange(clickedDate, events).length > 0 ? (
+                  getEventsInRange(clickedDate, events).map((event) => (
+                    <EventCard
+                      key={event.event_id}
+                      id={event.event_id}
+                      club={event.club || ""}
+                      title={event.title}
+                      date={new Date(event.date).toDateString()}
+                      room={event.room}
+                      favorite={event.favorite || false}
+                      incentives={
+                        Array.isArray(event.incentives) ? event.incentives : []
+                      }
+                      toggleFavorite={(id) => {
+                        setEvents((prevEvents) =>
+                          prevEvents.map((e) =>
+                            e.event_id === id
+                              ? { ...e, favorite: !e.favorite }
+                              : e
+                          )
+                        );
+                      }}
+                    />
+                  ))
+                ) : (
+                  <Typography color="textSecondary">
+                    No upcoming events for this week
+                  </Typography>
+                )}
+              </Box>
             </Paper>
           )}
         </Grid>
@@ -499,7 +554,7 @@ const CalendarPage: React.FC = () => {
           anchorOrigin={{ vertical: "top", horizontal: "right" }}
           sx={{
             position: "fixed",
-            mt: notifications.indexOf(notification) * 80, // Stack notifications vertically
+            mt: notifications.indexOf(notification) * 80,
           }}
         >
           <Alert
