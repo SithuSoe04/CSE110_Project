@@ -3,6 +3,7 @@ import initDB from "./createTable";
 import { createUserEndpoints } from "./users/users-endpoints";
 import { createEventEndpoints } from './events/events-endpoints';
 import { createFriendsEndpoints } from "./friends/friends-endpoints";
+import { createRecruitmentEndpoints } from "./recruitment/recruitment-endpoints";
 
 
 const cors = require('cors');
@@ -131,6 +132,7 @@ interface FavoriteRequest {
     createEventEndpoints(app, db);
     createUserEndpoints(app, db);
     createFriendsEndpoints(app, db);
+    createRecruitmentEndpoints(app, db);
 
     // Start the server
     app.listen(port, () => {

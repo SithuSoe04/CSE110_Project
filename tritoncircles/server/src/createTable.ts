@@ -14,6 +14,7 @@ const initDB = async () => {
       name VARCHAR(50) NOT NULL,
       email VARCHAR(50) NOT NULL,
       password VARCHAR(50) NOT NULL,
+      private INTEGER DEFAULT 0,
       college VARCHAR(50),
       major VARCHAR(50),
       year VARCHAR(50),
@@ -34,6 +35,16 @@ const initDB = async () => {
       date DATETIME,
       room VARCHAR(256),
       incentives TEXT,
+      FOREIGN KEY(club_id) REFERENCES clubs(club_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS recruitment (
+      recruitment_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      club_id INTEGER,
+      title VARCHAR(256),
+      date_posted DATETIME DEFAULT CURRENT_TIMESTAMP,
+      deadline DATETIME,
+      application_link TEXT,
       FOREIGN KEY(club_id) REFERENCES clubs(club_id)
     );
 

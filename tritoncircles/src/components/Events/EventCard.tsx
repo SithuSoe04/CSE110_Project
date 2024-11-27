@@ -23,20 +23,42 @@ interface EventProps {
     toggleFavorite: (id: number) => void,
 }
 
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+
+  // Format the date part as "Month Day, Year"
+  const formattedDate = date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short', 
+    day: 'numeric',
+  });
+
+  const options: Intl.DateTimeFormatOptions = {
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true, 
+  };
+  
+  const formattedTime = date.toLocaleTimeString('en-US', options);
+
+  // Combine both formatted date and time
+  return `${formattedDate}, ${formattedTime}`;
+};
+
 export default function EventCard(event: EventProps) {
   return (
     <Card sx={{ maxWidth: 345, borderRadius: 2 }}>
       <CardMedia
         sx={{ height: 140 }}
         image="https://www.screenskills.com/media/6780/software_engineer.png?width=560&mode=crop&scale=both&center=0,0"
-        title="green iguana"
+        title=""
       />
       <CardContent>
         <Typography gutterBottom variant="h6" component="div">
          <b>{event.title}</b>
         </Typography>
         <Typography gutterBottom variant="body2">
-            {event.date}
+            {formatDate(event.date)}
         </Typography>
         <Typography variant="body2">
            {event.room}
