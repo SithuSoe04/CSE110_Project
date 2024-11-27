@@ -17,7 +17,22 @@ const initDB = async () => {
       college VARCHAR(50),
       major VARCHAR(50),
       year VARCHAR(50),
-      minor VARCHAR(50)
+      minor VARCHAR(50),
+      securityQuestion VARCHAR(255),
+      securityAnswer VARCHAR(255)
+    );
+
+    CREATE TABLE IF NOT EXISTS temp_users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name VARCHAR(50) NOT NULL,
+      email VARCHAR(50) NOT NULL,
+      password VARCHAR(50) NOT NULL,
+      college VARCHAR(50),
+      major VARCHAR(50),
+      year VARCHAR(50),
+      minor VARCHAR(50),
+      securityQuestion VARCHAR(255),
+      securityAnswer VARCHAR(255)
     );
 
     CREATE TABLE IF NOT EXISTS clubs (

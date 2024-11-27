@@ -1,5 +1,5 @@
 import { Database } from "sqlite";
-import { userLogIn, updateUserProfile, userSignUp, userFavoriteClub, userFavoriteEvent, userUnfavoriteClub, userUnfavoriteEvent, } from "./users-utils";
+import { userLogIn, updateUserProfile, updateUserSecurity, finalizeUser, userSignUp, verifySecurity, updatePassword, userFavoriteClub, userFavoriteEvent, userUnfavoriteClub, userUnfavoriteEvent, } from "./users-utils";
 import { Request, Response } from "express";
 
 export function createUserEndpoints(app: any, db: Database) {
@@ -15,10 +15,28 @@ export function createUserEndpoints(app: any, db: Database) {
 
   });
 
+  app.post("/security", (req:Request, res:Response) => {
+    console.log("Received security update request:", req.body);
+    updateUserSecurity(req, res, db);
+  })
+
+  app.post("/finalizeSignup", (req:Request, res:Response) => {
+    console.log("Received finalize sign up request:", req.body);
+    finalizeUser(req, res, db);
+  })
+
   app.post("/login", (req: Request, res: Response) => {
 
     userLogIn(req, res, db);
 
+  });
+
+  app.post("/verifySecurity", (req:Request, res:Response) => {
+    verifySecurity(req, res, db);
+  });
+
+  app.post("/updatePassword", (req:Request, res:Response) => {
+    updatePassword(req, res, db);
   });
 
   app.post("/favoriteevent", (req: Request, res: Response) => {

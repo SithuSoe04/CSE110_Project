@@ -13,12 +13,15 @@ import {AuthProvider} from './context/AuthContext';
 import {useAuth} from './context/AuthContext';
 import Signup from './views/Signup';
 import SignupInfo from './views/SignupInfo';
+import Security from './views/Security';
 import Login from './views/Login';
+import Reset from './views/Reset';
+import PasswordUpdate from './views/PasswordUpdate';
 
 function App() {
   const location = useLocation();
   const {isAuthenticated} = useAuth();
-  const hideNavBar = ['/login', '/signup', '/signup-info'];
+  const hideNavBar = ['/login', '/signup', '/signup-info', '/security', '/reset', '/updatePassword'];
   const shouldHide = hideNavBar.includes(location.pathname);
 
   return (
@@ -36,6 +39,9 @@ function App() {
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<Signup />} />
           <Route path="signup-info" element={<SignupInfo />} />
+          <Route path="security" element={<Security />} />
+          <Route path="reset" element={<Reset />} />
+          <Route path="passwordUpdate" element={<PasswordUpdate />} />
         </Routes>
       </div>
   );

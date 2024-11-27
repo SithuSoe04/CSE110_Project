@@ -1,14 +1,15 @@
 import React, {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useLocation} from 'react-router-dom';
 import "./SignupInfo.css";
 import logo from "../assets/logo.png";
-import {useAuth} from '../context/AuthContext';
 
 const SignupInfo: React.FC =() => {
     const [userInfo, setUserInfo] = useState({
         major: '', college: '', year:'', minor: ''
     });
     const navigate = useNavigate();
+    const { state } = useLocation();
+    const { tempId } = state || {};
 
     const handleChange= (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const {name, value} = event.target;
@@ -17,13 +18,12 @@ const SignupInfo: React.FC =() => {
             [name]: value
         }));
     };
-    const {setIsAuthenticated} = useAuth();
     const handleSubmit = async (event:React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const user_id = localStorage.getItem('user_id');
-        console.log('Retrieved userID in SignupInfo:', user_id);
-        if(!user_id){
-            console.error('No user ID found');
+        const tempId = localStorage.getItem('tempId');
+        console.log('Retrieved tempId in SignupInfo:', tempId);
+        if(!tempId){
+            console.error('No tempId found');
             return;
         }
         try{
@@ -33,7 +33,7 @@ const SignupInfo: React.FC =() => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    user_id: user_id,
+                    tempId,
                     ...userInfo
                 })
             });
@@ -41,8 +41,8 @@ const SignupInfo: React.FC =() => {
             if(!response.ok){
                 throw new Error ('Failed to update user information');
             }
-            setIsAuthenticated(true);
-            navigate('/profile');
+            console.log('User info updated successfully');
+            navigate('/security', {state:{tempId}});
         } catch(error){
             console.error('Error during information update:', error);
         }

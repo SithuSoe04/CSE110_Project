@@ -14,12 +14,6 @@ const Profile = () => {
     const [interests, setInterests] = useState(["Front-End", "Robotics", "Dance"]);
     const [newInterest, setNewInterest] = useState<string>("");
     const [isAddingInterest, setIsAddingInterest] = useState<boolean>(false);
-    const {isAuthenticated} = useAuth();
-    const number = 0;
-
-    if(!isAuthenticated){
-        return <Navigate to="/login" replace />;
-    }
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];

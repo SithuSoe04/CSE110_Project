@@ -51,10 +51,10 @@ const Signup: React.FC = () => {
                 throw new Error(errorData.error || 'Signup failed');
             }
             const result = await response.json();
-            console.log('Signup successful:', result);
-            localStorage.setItem('user_id', result.user_id);
-            console.log('Stored user_id in localStorage:', localStorage.getItem('user_id'));
-            navigate('/signup-info');
+            console.log('Temporary signup successful:', result);
+            localStorage.setItem('tempId', result.tempId);
+            console.log('Stored tempId in localStorage:', localStorage.getItem('tempId'));
+            navigate('/signup-info', {state: {tempId: result.tempId}});
         }catch (error){
             console.error('Error during signup:', error);
         }

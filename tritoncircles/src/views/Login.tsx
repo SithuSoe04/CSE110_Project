@@ -37,7 +37,7 @@ const Login = () => {
             }
             else{
                 const errorData = await response.json();
-                throw new Error(errorData.error || 'Login failed');
+                throw new Error(errorData.error || 'Login failed. Please check your email or password.');
             }
             
         }catch(error: any){
@@ -69,8 +69,10 @@ const Login = () => {
                     onChange = {handleChange}
                     required
                 />
+                <button type="button" onClick={() => navigate('/reset')} className = "reset">Forgot Password?</button>
+                {error && <div className="error">{error}</div>}
                 <button type="submit" className = "login">Log In</button>
-                <button type = "button" onClick={() => navigate('/signup')} className ="link">Already have an account?</button>
+                <button type = "button" onClick={() => navigate('/signup')} className ="link">Create an account</button>
             </form>
         </div>
     );
