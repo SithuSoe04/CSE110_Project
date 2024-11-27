@@ -45,7 +45,7 @@ const Clubs: React.FC = () => {
 
       const initialClubs = response.data.clubs.map((club: Club) => ({
         ...club,
-        favorite: Boolean(club.favorite)
+        favorite: Boolean(club.favorite),
       }));
 
       console.log("Processed clubs:", initialClubs);
@@ -70,12 +70,12 @@ const Clubs: React.FC = () => {
       const response = await axios.post<{ success: boolean; message: string; error?: string }>(
         "http://localhost:8080/api/clubs/favorite",
         {
-          userId: 1,
-          clubId: clubId
+          userId: 1, // Replace with dynamic user ID as needed
+          clubId: clubId,
         },
         {
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           }
         }
       );
@@ -83,17 +83,17 @@ const Clubs: React.FC = () => {
       console.log("Toggle response:", response.data);
 
       if (response.data.success) {
-        setClubs((prevClubs: Club[]) => 
-          prevClubs.map((club: Club) => 
-            club.club_id === clubId 
+        setClubs((prevClubs: Club[]) =>
+          prevClubs.map((club: Club) =>
+            club.club_id === clubId
               ? { ...club, favorite: !club.favorite }
               : club
           )
         );
-        
+
         setSnackbar({
           open: true,
-          message: response.data.message || "Updated favorite status"
+          message: response.data.message || "Updated favorite status",
         });
       } else {
         throw new Error(response.data.error || "Failed to update favorite status");
@@ -101,14 +101,14 @@ const Clubs: React.FC = () => {
     } catch (err) {
       console.error("Error toggling favorite:", err);
       let errorMessage = "Failed to update favorite status";
-      
+
       if (axios.isAxiosError(err) && err.response?.data?.error) {
         errorMessage = err.response.data.error;
       }
 
       setSnackbar({
         open: true,
-        message: errorMessage
+        message: errorMessage,
       });
     }
   };
@@ -117,7 +117,7 @@ const Clubs: React.FC = () => {
     setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
-  const filteredClubs = clubs.filter((club: Club) => 
+  const filteredClubs = clubs.filter((club: Club) =>
     club.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     club.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -173,10 +173,10 @@ const Clubs: React.FC = () => {
       </Typography>
       <Grid container spacing={2} mb={5}>
         {favoriteClubs.length > 0 ? (
-          favoriteClubs.map((club: Club) => (
+          favoriteClubs.map((club) => (
             <Grid key={club.club_id} item xs={12} sm={6} md={4} lg={3}>
               <ClubCard
-                id={club.club_id}
+                id={club.club_id} // Map club_id to id
                 name={club.name}
                 description={club.description}
                 link={club.link}
@@ -200,10 +200,10 @@ const Clubs: React.FC = () => {
       </Typography>
       <Grid container spacing={2}>
         {otherClubs.length > 0 ? (
-          otherClubs.map((club: Club) => (
+          otherClubs.map((club) => (
             <Grid key={club.club_id} item xs={12} sm={6} md={4} lg={3}>
               <ClubCard
-                id={club.club_id}
+                id={club.club_id} // Map club_id to id
                 name={club.name}
                 description={club.description}
                 link={club.link}
