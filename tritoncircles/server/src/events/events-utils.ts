@@ -1,18 +1,5 @@
 import { Database } from "sqlite";
 import { Request, Response } from "express";
-//added import
-import { seedEvents } from './testEvents';
-
-// Add this new function
-export async function initializeTestData(db: Database) {
-    try {
-        await seedEvents(db);
-        return { success: true, message: 'Test data initialized successfully' };
-    } catch (error) {
-        return { success: false, message: `Error initializing test data: ${error}` };
-    }
-}
-
 
 export async function createEvent(req: Request, res: Response, db: Database) {
     const {club_id, title, date, room, incentives} = req.body as {club_id: number, title: string, date: string, room: string, incentives?: string}
@@ -65,12 +52,30 @@ export async function getUserUpcomingEvents(req: Request, res: Response, db: Dat
     }
 }
 
+export async function getUserNonFavoriteEvents(req: Request, res: Response, db: Database) {
+    const { user_id } = req.query;
+    try {
+        const userNonFavoriteEvents = await db.all(`
+            SELECT events.*, clubs.name AS club_name
+            FROM events
+            INNER JOIN clubs ON events.club_id = clubs.club_id
+            INNER JOIN club_favorites ON events.club_id = club_favorites.club_id
+            LEFT JOIN event_favorites ON events.event_id = event_favorites.event_id AND event_favorites.user_id = ?
+            WHERE club_favorites.user_id = ? AND event_favorites.event_id IS NULL
+        `, [user_id, user_id]);
+        
+        res.status(200).send({ "data": userNonFavoriteEvents });
+    }
+    catch (error) {
+        res.status(500).send({ error: `Error getting user upcoming non-favorite events: ${error}` });
+    }
+}
+
 export async function getUserFavoriteEvents(req: Request, res: Response, db: Database) {
     const { user_id } = req.query;
     try {
-        const userFavoriteEvents = await db.all(`SELECT events.* FROM events INNER JOIN event_favorites ON events.event_id = event_favorites.event_id WHERE event_favorites.user_id = ?`, [user_id]);
+        const userFavoriteEvents = await db.all(`SELECT events.*, clubs.name AS club_name FROM events INNER JOIN clubs ON events.club_id = clubs.club_id INNER JOIN event_favorites ON events.event_id = event_favorites.event_id WHERE event_favorites.user_id = ?`, [user_id]);
         res.status(200).send({"data": userFavoriteEvents});
-        console.log(userFavoriteEvents);
     }
     catch (error){
         res.status(500).send({ error: `Error getting user upcoming events: , + ${error}` });

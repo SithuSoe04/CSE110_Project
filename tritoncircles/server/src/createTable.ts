@@ -8,9 +8,19 @@ const initDB = async () => {
     driver: sqlite3.Database,
   });
 
-  await db.exec(`
+  // await db.exec(`
+  //   DELETE FROM users;
+  //   DELETE FROM events;
+  //   DELETE FROM clubs;
+  //   DELETE FROM event_favorites;
+  //   DELETE FROM club_favorites;
+  //   DELETE FROM friend_requests;
+  //   DELETE FROM friends;
+  //   DELETE FROM friends_interested_events;
+  // `);
 
-   DROP TABLE IF EXISTS clubs;
+
+  await db.exec(`
    CREATE TABLE IF NOT EXISTS users (
       user_id INTEGER PRIMARY KEY AUTOINCREMENT,
       name VARCHAR(50) NOT NULL,
@@ -254,10 +264,9 @@ const initDB = async () => {
 
   console.log("Seeded 100 clubs into the database");
 
-  // Log tables created
   console.log("Database initialized with tables:");
   const tables = await db.all("SELECT name FROM sqlite_master WHERE type='table'");
-  tables.forEach((table) => console.log(`- ${table.name}`));
+  tables.forEach(table => console.log(`- ${table.name}`));
 
   return db;
 };
