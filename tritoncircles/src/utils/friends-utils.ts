@@ -32,38 +32,39 @@ export const fetchFriendRequests = async () => {
 };
 
 
-export const acceptRequest = async (id: number) => {
-  const user_id = localStorage.getItem("user_id");
+export const acceptRequest = async (friendRequestId: number) => {
+  const userId = localStorage.getItem("user_id");
 
-  if (!user_id) {
+  if (!userId) {
     console.error("User is not logged in.");
     return [];
   }
 
   try {
-    // console.log("Sending accept request for ID:", id)
-    const response = await fetch(`${API_BASE_URL}/friends/requests/${id}/accept`, {
+    console.log("Accepting request for friend ID:", friendRequestId); // Debug log
+    const response = await fetch(`${API_BASE_URL}/friends/requests/${friendRequestId}/accept`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ user_id }),
+      body: JSON.stringify({ user_id: userId }), // user_id for backend validation
     });
-  
+
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`Error accepting friend request:`, errorText);
       return [];
     }
-  
+
     const data = await response.json();
-    // console.log("Friend request accepted successfully.");
+    console.log("Friend request accepted successfully:", data); // Debug log
     return data;
   } catch (err) {
     console.error(`Unexpected error:`, err);
     return [];
-  }  
+  }
 };
+
 
 
 export const declineRequest = async (id: number) => {

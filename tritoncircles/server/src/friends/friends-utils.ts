@@ -22,12 +22,13 @@ export async function getAllFriendRequests(
 }
 
 export async function acceptFriendRequest(req: Request, res: Response, db: Database) {
-  const { id } = req.params;
+  const { id } = req.params; // request_id
   const userId = req.body.user_id;
 
   try {
+    // Check if the friend request exists and is pending
     const friendRequest = await db.get(
-      "SELECT * FROM friend_requests WHERE sender_id = ? AND user_id = ? AND status = 'pending'",
+      "SELECT * FROM friend_requests WHERE request_id = ? AND user_id = ? AND status = 'pending'",
       [id, userId]
     );
 
@@ -35,7 +36,8 @@ export async function acceptFriendRequest(req: Request, res: Response, db: Datab
       return res.status(404).json({ error: "Friend request not found or already processed." });
     }
 
-    const connection = `${friendRequest.sender_id}-${friendRequest.user_id}`;
+    // Create a unique connection string
+    const connection = `${Math.min(friendRequest.sender_id, friendRequest.user_id)}-${Math.max(friendRequest.sender_id, friendRequest.user_id)}`;
     const friendshipDate = new Date().toISOString();
 
     // Insert the friendship into the friends table
@@ -45,8 +47,9 @@ export async function acceptFriendRequest(req: Request, res: Response, db: Datab
     );
 
     // Update the friend request's status to "accepted"
-    await db.run("UPDATE friend_requests SET status = 'accepted' WHERE sender_id = ? AND user_id = ?", 
-      [id, userId]
+    await db.run(
+      "UPDATE friend_requests SET status = 'accepted' WHERE request_id = ?",
+      [id]
     );
 
     res.json({ message: "Friend request accepted.", status: "accepted" });
@@ -57,12 +60,13 @@ export async function acceptFriendRequest(req: Request, res: Response, db: Datab
 }
 
 
+
 export async function declineFriendRequest(req: Request, res: Response, db: Database) {
   const { id } = req.params;
 
   try {
     // Update the friend request's status to "declined"
-    await db.run("UPDATE friend_requests SET status = 'declined' WHERE sender_id = ?", [id]);
+    await db.run("UPDATE friend_requests SET status = 'declined' WHERE request_id = ?", [id]);
 
     // Respond with success and updated status
     res.json({ message: "Friend request declined.", status: "declined" });
