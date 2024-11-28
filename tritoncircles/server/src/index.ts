@@ -2,7 +2,6 @@ import express, { Request, Response } from "express";
 import initDB from "./createTable";
 import { createUserEndpoints } from "./users/users-endpoints";
 import { createEventEndpoints } from "./events/events-endpoints";
-import { createEventEndpoints } from './events/events-endpoints';
 import { createFriendsEndpoints } from "./friends/friends-endpoints";
 import { createRecruitmentEndpoints } from "./recruitment/recruitment-endpoints";
 

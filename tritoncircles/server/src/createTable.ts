@@ -8,16 +8,16 @@ const initDB = async () => {
     driver: sqlite3.Database,
   });
 
-  // await db.exec(`
-  //   DELETE FROM users;
-  //   DELETE FROM events;
-  //   DELETE FROM clubs;
-  //   DELETE FROM event_favorites;
-  //   DELETE FROM club_favorites;
-  //   DELETE FROM friend_requests;
-  //   DELETE FROM friends;
-  //   DELETE FROM friends_interested_events;
-  // `);
+  await db.exec(`
+    DELETE FROM users;
+    DELETE FROM events;
+    DELETE FROM clubs;
+    DELETE FROM event_favorites;
+    DELETE FROM club_favorites;
+    DELETE FROM friend_requests;
+    DELETE FROM friends;
+    DELETE FROM friends_interested_events;
+  `);
 
 
   await db.exec(`
@@ -105,148 +105,6 @@ const initDB = async () => {
 
   // Seed the clubs table with 100 clubs
   const clubs = [
-    { name: "4N01 Dance Team", description: "A dance team that performs various styles and participates in competitions.", link: "https://studentorg.ucsd.edu/Home/Details/17001" },
-    { name: "528 @UC San Diego", description: "A community service organization focused on local outreach programs.", link: "https://studentorg.ucsd.edu/Home/Details/17002" },
-    { name: "A Friend in Me at UC San Diego", description: "Provides companionship and support to individuals in need within the community.", link: "https://studentorg.ucsd.edu/Home/Details/17003" },
-    { name: "A Lutheran Ministry Social (ALMS)", description: "A faith-based group offering social and spiritual activities.", link: "https://studentorg.ucsd.edu/Home/Details/17004" },
-    { name: "Academic Enrichment for Relocated Students (AERS)", description: "Supports students who have relocated, providing academic resources and community.", link: "https://studentorg.ucsd.edu/Home/Details/17005" },
-    { name: "Academy of Managed Care Pharmacy (AMCP at UC San Diego)", description: "Focuses on the practice of managed care pharmacy, offering educational events.", link: "https://studentorg.ucsd.edu/Home/Details/17006" },
-    { name: "Acamazing", description: "An a cappella group performing a variety of musical genres.", link: "https://studentorg.ucsd.edu/Home/Details/17007" },
-    { name: "Active Minds", description: "Promotes mental health awareness and education among students.", link: "https://studentorg.ucsd.edu/Home/Details/17008" },
-    { name: "Acts 2 Fellowship", description: "A Christian fellowship group offering Bible studies and community service.", link: "https://studentorg.ucsd.edu/Home/Details/17009" },
-    { name: "Advanced Professional Degree Consulting Club at UC San Diego", description: "Provides consulting experience and networking for advanced degree students.", link: "https://studentorg.ucsd.edu/Home/Details/17010" },
-    { name: "Aequora Ballet Company", description: "A ballet company that performs classical and contemporary pieces.", link: "https://studentorg.ucsd.edu/Home/Details/17011" },
-    { name: "Afghan Student Association (ASA)", description: "Promotes Afghan culture and heritage through various events.", link: "https://studentorg.ucsd.edu/Home/Details/17012" },
-    { name: "Ahlul-Bayt Student Association", description: "Aims to educate about the teachings of the Ahlul-Bayt.", link: "https://studentorg.ucsd.edu/Home/Details/17013" },
-    { name: "AI Sphere", description: "Focuses on artificial intelligence research and projects.", link: "https://studentorg.ucsd.edu/Home/Details/17014" },
-    { name: "AIDS Awareness Alliance at UC San Diego", description: "Raises awareness about HIV/AIDS through education and events.", link: "https://studentorg.ucsd.edu/Home/Details/17015" },
-    { name: "Airsoft at UC San Diego", description: "A club for airsoft enthusiasts to organize games and events.", link: "https://studentorg.ucsd.edu/Home/Details/17016" },
-    { name: "All Peoples Church at UC San Diego", description: "A Christian community offering worship services and fellowship.", link: "https://studentorg.ucsd.edu/Home/Details/17017" },
-    { name: "Alpha", description: "Explores the basics of the Christian faith through discussions.", link: "https://studentorg.ucsd.edu/Home/Details/17018" },
-    { name: "Alpha Chi Omega", description: "A women's fraternity promoting friendship, leadership, and service.", link: "https://studentorg.ucsd.edu/Home/Details/17019" },
-    { name: "Alpha Epsilon Delta Pre-Health Professional Honor Society", description: "A society for students pursuing careers in healthcare.", link: "https://studentorg.ucsd.edu/Home/Details/17020" },
-    { name: "Alpha Gamma Alpha", description: "A sorority promoting sisterhood and Armenian culture.", link: "https://studentorg.ucsd.edu/Home/Details/17021" },
-    { name: "Alpha Kappa Alpha Sorority, Inc.", description: "The first African American sorority promoting service and sisterhood.", link: "https://studentorg.ucsd.edu/Home/Details/17022" },
-    { name: "Alpha Kappa Psi", description: "A co-ed business fraternity focused on leadership and professional development.", link: "https://studentorg.ucsd.edu/Home/Details/17023" },
-    { name: "Alpha Omicron Pi", description: "A womens fraternity focusing on sisterhood, scholarship, and philanthropy.", link: "https://studentorg.ucsd.edu/Home/Details/17024" },
-    { name: "Alpha Phi Alpha Fraternity, Inc.", description: "The first intercollegiate historically Black fraternity promoting scholarship and service.", link: "https://studentorg.ucsd.edu/Home/Details/17025" },
-    { name: "Alpha Phi International Fraternity", description: "A sorority encouraging sisterhood, scholarship, and leadership.", link: "https://studentorg.ucsd.edu/Home/Details/17026" },
-    { name: "Alpha Pi Sigma", description: "A Latina-based sorority empowering women through sisterhood and service.", link: "https://studentorg.ucsd.edu/Home/Details/17027" },
-    { name: "Alpha Psi Omega", description: "A national honorary theatre society supporting the dramatic arts.", link: "https://studentorg.ucsd.edu/Home/Details/17028" },
-    { name: "Alpine Club", description: "A club for outdoor enthusiasts focused on climbing and mountaineering.", link: "https://studentorg.ucsd.edu/Home/Details/17029" },
-    { name: "Alternative Breaks @ UC San Diego", description: "Provides service-learning trips focused on social justice.", link: "https://studentorg.ucsd.edu/Home/Details/17030" },
-    { name: "American Advertising Federation (AAF)", description: "Supports students interested in careers in advertising and marketing.", link: "https://studentorg.ucsd.edu/Home/Details/17031" },
-    { name: "American Institute of Aeronautics and Astronautics (AIAA)", description: "Promotes interest and development in aerospace engineering.", link: "https://studentorg.ucsd.edu/Home/Details/17032" },
-    { name: "American Medical Women's Association (AMWA)", description: "Supports and empowers women in medicine and healthcare.", link: "https://studentorg.ucsd.edu/Home/Details/17033" },
-    { name: "American Red Cross Club at UC San Diego", description: "Partners with the Red Cross to organize blood drives and community events.", link: "https://studentorg.ucsd.edu/Home/Details/17034" },
-    { name: "American Society of Civil Engineers (ASCE)", description: "Provides networking and resources for civil engineering students.", link: "https://studentorg.ucsd.edu/Home/Details/17035" },
-    { name: "American Society of Mechanical Engineers (ASME)", description: "Supports students in mechanical engineering with career and project resources.", link: "https://studentorg.ucsd.edu/Home/Details/17036" },
-    { name: "Amnesty International at UC San Diego", description: "Advocates for human rights through campaigns and education.", link: "https://studentorg.ucsd.edu/Home/Details/17037" },
-    { name: "Anime and Manga Club", description: "Connects fans of anime and manga through events and discussions.", link: "https://studentorg.ucsd.edu/Home/Details/17038" },
-    { name: "Anthropology Club", description: "Explores topics in anthropology through guest speakers and field trips.", link: "https://studentorg.ucsd.edu/Home/Details/17039" },
-    { name: "Applied Math Club", description: "Supports students interested in applied mathematics and its applications.", link: "https://studentorg.ucsd.edu/Home/Details/17040" },
-    { name: "Aquatics Club", description: "A club for students interested in swimming, diving, and other water sports.", link: "https://studentorg.ucsd.edu/Home/Details/17041" },
-    { name: "Arab Student Union (ASU)", description: "Celebrates Arab culture and heritage through events and activities.", link: "https://studentorg.ucsd.edu/Home/Details/17042" },
-    { name: "Armenian Student Association (ASA)", description: "Promotes Armenian culture and heritage among the student body.", link: "https://studentorg.ucsd.edu/Home/Details/17043" },
-    { name: "ArtPower! Student Engagement", description: "Engages students with the performing arts through events and workshops.", link: "https://studentorg.ucsd.edu/Home/Details/17044" },
-    { name: "Asian American Student Alliance (AASA)", description: "Advocates for Asian American students and fosters cultural awareness.", link: "https://studentorg.ucsd.edu/Home/Details/17045" },
-    { name: "Asian Pacific Islander Student Alliance (APISA)", description: "Focuses on issues affecting the API student community.", link: "https://studentorg.ucsd.edu/Home/Details/17046" },
-    { name: "Astronomy Club", description: "Offers stargazing events and discussions about astronomy.", link: "https://studentorg.ucsd.edu/Home/Details/17047" },
-    { name: "Athletes for Action (AIA)", description: "Supports athletes in developing leadership skills and community service.", link: "https://studentorg.ucsd.edu/Home/Details/17048" },
-    { name: "Audio Engineering Society (AES)", description: "Connects students interested in sound design and engineering.", link: "https://studentorg.ucsd.edu/Home/Details/17049" },
-    { name: "Aviation Club", description: "Promotes aviation and flight training opportunities for students.", link: "https://studentorg.ucsd.edu/Home/Details/17050" },
-    { name: "Ballet Folklorico La Joya de Mexico", description: "Celebrates Mexican heritage through traditional dance performances.", link: "https://studentorg.ucsd.edu/Home/Details/17051" },
-    { name: "Bangladesh Student Association (BSA)", description: "Promotes Bangladeshi culture and community at UCSD.", link: "https://studentorg.ucsd.edu/Home/Details/17052" },
-    { name: "Beach Volleyball Club", description: "Connects students with a passion for beach volleyball.", link: "https://studentorg.ucsd.edu/Home/Details/17053" },
-    { name: "Biomedical Engineering Society (BMES)", description: "Supports students in biomedical engineering with networking and resources.", link: "https://studentorg.ucsd.edu/Home/Details/17054" },
-    { name: "Black Student Union (BSU)", description: "Fosters community and advocates for the needs of Black students.", link: "https://studentorg.ucsd.edu/Home/Details/17055" },
-    { name: "Blockchain and Cryptocurrency Club", description: "Explores blockchain technology and cryptocurrency innovation.", link: "https://studentorg.ucsd.edu/Home/Details/17056" },
-    { name: "Book Club at UCSD", description: "Encourages reading and discussions on a variety of literary works.", link: "https://studentorg.ucsd.edu/Home/Details/17057" },
-    { name: "Business Council", description: "Supports aspiring business professionals through events and mentorship.", link: "https://studentorg.ucsd.edu/Home/Details/17058" },
-    { name: "Caledonian Society", description: "Celebrates Scottish culture through events and traditions.", link: "https://studentorg.ucsd.edu/Home/Details/17059" },
-    { name: "Cambodian Student Association (CSA)", description: "Promotes Cambodian culture and history on campus.", link: "https://studentorg.ucsd.edu/Home/Details/17060" },
-    { name: "Cancer Awareness and Outreach (CAO)", description: "Raises awareness about cancer prevention and supports patients.", link: "https://studentorg.ucsd.edu/Home/Details/17061" },
-    { name: "Career Services Peer Educators", description: "Helps students prepare for their careers with resume workshops and more.", link: "https://studentorg.ucsd.edu/Home/Details/17062" },
-    { name: "Caribbean Student Association (CSA)", description: "Celebrates Caribbean culture and fosters community.", link: "https://studentorg.ucsd.edu/Home/Details/17063" },
-    { name: "Caving Club", description: "Explores caves and teaches safe caving practices.", link: "https://studentorg.ucsd.edu/Home/Details/17064" },
-    { name: "Chess Club at UCSD", description: "Connects chess enthusiasts for casual and competitive play.", link: "https://studentorg.ucsd.edu/Home/Details/17065" },
-    { name: "Chinese American Student Association (CASA)", description: "Fosters connections and celebrates Chinese culture.", link: "https://studentorg.ucsd.edu/Home/Details/17066" },
-    { name: "Chinese Dance Association", description: "Showcases Chinese culture through traditional and modern dance.", link: "https://studentorg.ucsd.edu/Home/Details/17067" },
-    { name: "Circle K International", description: "Promotes leadership, fellowship, and service through community projects.", link: "https://studentorg.ucsd.edu/Home/Details/17068" },
-    { name: "Climbing Club", description: "Provides opportunities for climbing enthusiasts to connect and train.", link: "https://studentorg.ucsd.edu/Home/Details/17069" },
-    { name: "Coding for Social Good", description: "Focuses on creating software solutions for nonprofit organizations.", link: "https://studentorg.ucsd.edu/Home/Details/17070" },
-    { name: "College Democrats at UCSD", description: "Engages students in Democratic Party politics and campaigns.", link: "https://studentorg.ucsd.edu/Home/Details/17071" },
-    { name: "College Republicans at UCSD", description: "Encourages political discourse and involvement in Republican Party initiatives.", link: "https://studentorg.ucsd.edu/Home/Details/17072" },
-    { name: "Comedy Club", description: "Provides a platform for students to practice and perform stand-up comedy.", link: "https://studentorg.ucsd.edu/Home/Details/17073" },
-    { name: "Community Garden Club", description: "Promotes sustainability and gardening on campus.", link: "https://studentorg.ucsd.edu/Home/Details/17074" },
-    { name: "Computer Science and Engineering Society (CSES)", description: "Supports CSE students with professional development and projects.", link: "https://studentorg.ucsd.edu/Home/Details/17075" },
-    { name: "Cooking Club", description: "Brings together students to learn and share recipes.", link: "https://studentorg.ucsd.edu/Home/Details/17076" },
-    { name: "Creative Writing Club", description: "Fosters a community for writers to share and develop their work.", link: "https://studentorg.ucsd.edu/Home/Details/17077" },
-    { name: "Cyber Security Club", description: "Teaches students about cybersecurity principles and practices.", link: "https://studentorg.ucsd.edu/Home/Details/17078" },
-    { name: "Dance Dance Revolution Club", description: "For fans of the iconic arcade dance game.", link: "https://studentorg.ucsd.edu/Home/Details/17079" },
-    { name: "Data Science Student Society (DSSS)", description: "Supports students pursuing data science careers and research.", link: "https://studentorg.ucsd.edu/Home/Details/17080" },
-    { name: "Debate Society", description: "Encourages students to develop public speaking and debate skills.", link: "https://studentorg.ucsd.edu/Home/Details/17081" },
-    { name: "Design for America (DFA)", description: "Focuses on social innovation through human-centered design.", link: "https://studentorg.ucsd.edu/Home/Details/17082" },
-    { name: "Disability Advocates", description: "Promotes accessibility and inclusion on campus.", link: "https://studentorg.ucsd.edu/Home/Details/17083" },
-    { name: "Disney Fan Club", description: "Connects students who love Disney movies, parks, and culture.", link: "https://studentorg.ucsd.edu/Home/Details/17084" },
-    { name: "Dragon Boat Club", description: "A team-based water sport promoting fitness and teamwork.", link: "https://studentorg.ucsd.edu/Home/Details/17085" },
-    { name: "Economics Club", description: "Engages students with an interest in economics through events and networking.", link: "https://studentorg.ucsd.edu/Home/Details/17086" },
-    { name: "Education Studies Student Association (ESSA)", description: "Supports students pursuing careers in education.", link: "https://studentorg.ucsd.edu/Home/Details/17087" },
-    { name: "Electric Racing Team", description: "Designs and builds electric race cars for competition.", link: "https://studentorg.ucsd.edu/Home/Details/17088" },
-    { name: "Environmental Club", description: "Advocates for sustainability and environmental awareness.", link: "https://studentorg.ucsd.edu/Home/Details/17089" },
-    { name: "Esports Club", description: "Connects gamers and organizes competitive gaming events.", link: "https://studentorg.ucsd.edu/Home/Details/17090" },
-    { name: "Ethnic Studies Graduate Student Association (ESGSA)", description: "Supports graduate students in ethnic studies with resources and networking.", link: "https://studentorg.ucsd.edu/Home/Details/17091" },
-    { name: "Exercise is Medicine", description: "Promotes physical activity as part of a healthy lifestyle.", link: "https://studentorg.ucsd.edu/Home/Details/17092" },
-    { name: "Fantasy Sports Club", description: "Brings together fans of fantasy sports for leagues and discussions.", link: "https://studentorg.ucsd.edu/Home/Details/17093" },
-    { name: "Fashion Forward", description: "Explores fashion trends and design.", link: "https://studentorg.ucsd.edu/Home/Details/17094" },
-    { name: "Filipino Student Association (FSA)", description: "Celebrates Filipino culture and community.", link: "https://studentorg.ucsd.edu/Home/Details/17095" },
-    { name: "Finance Club", description: "Supports students pursuing careers in finance with resources and mentorship.", link: "https://studentorg.ucsd.edu/Home/Details/17096" },
-    { name: "Fire Spinners Club", description: "Teaches and performs the art of fire spinning and flow arts.", link: "https://studentorg.ucsd.edu/Home/Details/17097" },
-    { name: "Formula SAE", description: "Designs and builds race cars for national competitions.", link: "https://studentorg.ucsd.edu/Home/Details/17098" },
-    { name: "Ballet Folklorico La Joya de Mexico", description: "Celebrates Mexican heritage through traditional dance performances.", link: "https://studentorg.ucsd.edu/Home/Details/17051" },
-    { name: "Bangladesh Student Association (BSA)", description: "Promotes Bangladeshi culture and community at UCSD.", link: "https://studentorg.ucsd.edu/Home/Details/17052" },
-    { name: "Beach Volleyball Club", description: "Connects students with a passion for beach volleyball.", link: "https://studentorg.ucsd.edu/Home/Details/17053" },
-    { name: "Biomedical Engineering Society (BMES)", description: "Supports students in biomedical engineering with networking and resources.", link: "https://studentorg.ucsd.edu/Home/Details/17054" },
-    { name: "Black Student Union (BSU)", description: "Fosters community and advocates for the needs of Black students.", link: "https://studentorg.ucsd.edu/Home/Details/17055" },
-    { name: "Blockchain and Cryptocurrency Club", description: "Explores blockchain technology and cryptocurrency innovation.", link: "https://studentorg.ucsd.edu/Home/Details/17056" },
-    { name: "Book Club at UCSD", description: "Encourages reading and discussions on a variety of literary works.", link: "https://studentorg.ucsd.edu/Home/Details/17057" },
-    { name: "Business Council", description: "Supports aspiring business professionals through events and mentorship.", link: "https://studentorg.ucsd.edu/Home/Details/17058" },
-    { name: "Caledonian Society", description: "Celebrates Scottish culture through events and traditions.", link: "https://studentorg.ucsd.edu/Home/Details/17059" },
-    { name: "Cambodian Student Association (CSA)", description: "Promotes Cambodian culture and history on campus.", link: "https://studentorg.ucsd.edu/Home/Details/17060" },
-    { name: "Cancer Awareness and Outreach (CAO)", description: "Raises awareness about cancer prevention and supports patients.", link: "https://studentorg.ucsd.edu/Home/Details/17061" },
-    { name: "Career Services Peer Educators", description: "Helps students prepare for their careers with resume workshops and more.", link: "https://studentorg.ucsd.edu/Home/Details/17062" },
-    { name: "Caribbean Student Association (CSA)", description: "Celebrates Caribbean culture and fosters community.", link: "https://studentorg.ucsd.edu/Home/Details/17063" },
-    { name: "Caving Club", description: "Explores caves and teaches safe caving practices.", link: "https://studentorg.ucsd.edu/Home/Details/17064" },
-    { name: "Chess Club at UCSD", description: "Connects chess enthusiasts for casual and competitive play.", link: "https://studentorg.ucsd.edu/Home/Details/17065" },
-    { name: "Chinese American Student Association (CASA)", description: "Fosters connections and celebrates Chinese culture.", link: "https://studentorg.ucsd.edu/Home/Details/17066" },
-    { name: "Chinese Dance Association", description: "Showcases Chinese culture through traditional and modern dance.", link: "https://studentorg.ucsd.edu/Home/Details/17067" },
-    { name: "Circle K International", description: "Promotes leadership, fellowship, and service through community projects.", link: "https://studentorg.ucsd.edu/Home/Details/17068" },
-    { name: "Climbing Club", description: "Provides opportunities for climbing enthusiasts to connect and train.", link: "https://studentorg.ucsd.edu/Home/Details/17069" },
-    { name: "Coding for Social Good", description: "Focuses on creating software solutions for nonprofit organizations.", link: "https://studentorg.ucsd.edu/Home/Details/17070" },
-    { name: "College Democrats at UCSD", description: "Engages students in Democratic Party politics and campaigns.", link: "https://studentorg.ucsd.edu/Home/Details/17071" },
-    { name: "College Republicans at UCSD", description: "Encourages political discourse and involvement in Republican Party initiatives.", link: "https://studentorg.ucsd.edu/Home/Details/17072" },
-    { name: "Comedy Club", description: "Provides a platform for students to practice and perform stand-up comedy.", link: "https://studentorg.ucsd.edu/Home/Details/17073" },
-    { name: "Community Garden Club", description: "Promotes sustainability and gardening on campus.", link: "https://studentorg.ucsd.edu/Home/Details/17074" },
-    { name: "Computer Science and Engineering Society (CSES)", description: "Supports CSE students with professional development and projects.", link: "https://studentorg.ucsd.edu/Home/Details/17075" },
-    { name: "Cooking Club", description: "Brings together students to learn and share recipes.", link: "https://studentorg.ucsd.edu/Home/Details/17076" },
-    { name: "Creative Writing Club", description: "Fosters a community for writers to share and develop their work.", link: "https://studentorg.ucsd.edu/Home/Details/17077" },
-    { name: "Cyber Security Club", description: "Teaches students about cybersecurity principles and practices.", link: "https://studentorg.ucsd.edu/Home/Details/17078" },
-    { name: "Dance Dance Revolution Club", description: "For fans of the iconic arcade dance game.", link: "https://studentorg.ucsd.edu/Home/Details/17079" },
-    { name: "Data Science Student Society (DSSS)", description: "Supports students pursuing data science careers and research.", link: "https://studentorg.ucsd.edu/Home/Details/17080" },
-    { name: "Debate Society", description: "Encourages students to develop public speaking and debate skills.", link: "https://studentorg.ucsd.edu/Home/Details/17081" },
-    { name: "Design for America (DFA)", description: "Focuses on social innovation through human-centered design.", link: "https://studentorg.ucsd.edu/Home/Details/17082" },
-    { name: "Disability Advocates", description: "Promotes accessibility and inclusion on campus.", link: "https://studentorg.ucsd.edu/Home/Details/17083" },
-    { name: "Disney Fan Club", description: "Connects students who love Disney movies, parks, and culture.", link: "https://studentorg.ucsd.edu/Home/Details/17084" },
-    { name: "Dragon Boat Club", description: "A team-based water sport promoting fitness and teamwork.", link: "https://studentorg.ucsd.edu/Home/Details/17085" },
-    { name: "Economics Club", description: "Engages students with an interest in economics through events and networking.", link: "https://studentorg.ucsd.edu/Home/Details/17086" },
-    { name: "Education Studies Student Association (ESSA)", description: "Supports students pursuing careers in education.", link: "https://studentorg.ucsd.edu/Home/Details/17087" },
-    { name: "Electric Racing Team", description: "Designs and builds electric race cars for competition.", link: "https://studentorg.ucsd.edu/Home/Details/17088" },
-    { name: "Environmental Club", description: "Advocates for sustainability and environmental awareness.", link: "https://studentorg.ucsd.edu/Home/Details/17089" },
-    { name: "Esports Club", description: "Connects gamers and organizes competitive gaming events.", link: "https://studentorg.ucsd.edu/Home/Details/17090" },
-    { name: "Ethnic Studies Graduate Student Association (ESGSA)", description: "Supports graduate students in ethnic studies with resources and networking.", link: "https://studentorg.ucsd.edu/Home/Details/17091" },
-    { name: "Exercise is Medicine", description: "Promotes physical activity as part of a healthy lifestyle.", link: "https://studentorg.ucsd.edu/Home/Details/17092" },
-    { name: "Fantasy Sports Club", description: "Brings together fans of fantasy sports for leagues and discussions.", link: "https://studentorg.ucsd.edu/Home/Details/17093" },
-    { name: "Fashion Forward", description: "Explores fashion trends and design.", link: "https://studentorg.ucsd.edu/Home/Details/17094" },
     { name: "Filipino Student Association (FSA)", description: "Celebrates Filipino culture and community.", link: "https://studentorg.ucsd.edu/Home/Details/17095" },
     { name: "Finance Club", description: "Supports students pursuing careers in finance with resources and mentorship.", link: "https://studentorg.ucsd.edu/Home/Details/17096" },
     { name: "Fire Spinners Club", description: "Teaches and performs the art of fire spinning and flow arts.", link: "https://studentorg.ucsd.edu/Home/Details/17097" },
@@ -262,6 +120,82 @@ const initDB = async () => {
     );
   }
 
+
+  // const friendRequests = [
+  //   {
+  //     request_id: 1,
+  //     sender_id: 1,
+  //     sender_name: "Bob",
+  //     user_id: 7,
+  //     status: "pending",
+  //     message: "Looking forward to collaborating on projects!",
+  //     created_at: "2024-11-02 09:15:00"
+  //   },
+  //   {
+  //     request_id: 2,
+  //     sender_id: 2,
+  //     sender_name: "Charlie",
+  //     user_id: 7,
+  //     status: "pending",
+  //     message: "Hi, I think we have mutual interests.",
+  //     created_at: "2024-11-03 17:45:00"
+  //   },
+  //   {
+  //     request_id: 3, 
+  //     sender_id: 3,
+  //     sender_name: "Diana",
+  //     user_id: 7,
+  //     status: "pending",
+  //     message: "Hello! I'd like to add you to my network.",
+  //     created_at: "2024-11-04 11:00:00"
+  //   }
+  // ];
+  
+  // // Insert the sample data into the database
+  // for (const request of friendRequests) {
+  //   await db.run(
+  //     `INSERT INTO friend_requests (request_id, sender_id, sender_name, user_id, status, message, created_at)
+  //      VALUES (?, ?, ?, ?, ?, ?, ?)`,
+  //     [
+  //       request.request_id,
+  //       request.sender_id,
+  //       request.sender_name,
+  //       request.user_id,
+  //       request.status,
+  //       request.message,
+  //       request.created_at
+  //     ]
+  //   );
+  // }
+  
+  // const friendsInterestedEvents = [
+  //   {
+  //     friend_id: 1, // Friend ID referring to "Bob"
+  //     event_id: 1  // Refers to "FSA Cultural Night"
+  //   },
+  //   {
+  //     friend_id: 1, // Friend ID referring to "Bob"
+  //     event_id: 3  // Refers to "Fire Spinning Workshop"
+  //   },
+  //   {
+  //     friend_id: 2, // Friend ID referring to "Charlie"
+  //     event_id: 2  // Refers to "Finance 101 Workshop"
+  //   }
+  // ];
+  
+  // // Insert the sample data into the database
+  // for (const interestedEvent of friendsInterestedEvents) {
+  //   await db.run(
+  //     `INSERT INTO friends_interested_events (friend_id, event_id)
+  //      VALUES (?, ?)`,
+  //     [interestedEvent.friend_id, interestedEvent.event_id]
+  //   );
+  // }
+  
+  // console.log("Sample friends' interested events added to the database.");  
+
+  // console.log("Sample friend requests added to the database.");
+  
   console.log("Seeded 100 clubs into the database");
 
   console.log("Database initialized with tables:");

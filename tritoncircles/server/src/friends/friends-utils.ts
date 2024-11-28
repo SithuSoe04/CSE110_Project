@@ -23,24 +23,31 @@ export async function getAllFriendRequests(
 
 export async function acceptFriendRequest(req: Request, res: Response, db: Database) {
   const { id } = req.params;
+  const userId = req.body.user_id;
+
   try {
     const friendRequest = await db.get(
-      "SELECT * FROM friend_requests WHERE sender_id = ? AND status = 'pending'",
-      [id]
+      "SELECT * FROM friend_requests WHERE sender_id = ? AND user_id = ? AND status = 'pending'",
+      [id, userId]
     );
 
     if (!friendRequest) {
       return res.status(404).json({ error: "Friend request not found or already processed." });
     }
 
+    const connection = `${friendRequest.sender_id}-${friendRequest.user_id}`;
+    const friendshipDate = new Date().toISOString();
+
     // Insert the friendship into the friends table
     await db.run(
       "INSERT INTO friends (connection, friendship_date) VALUES (?, ?)",
-      [friendRequest.connection, friendRequest.date]
+      [connection, friendshipDate]
     );
 
     // Update the friend request's status to "accepted"
-    await db.run("UPDATE friend_requests SET status = 'accepted' WHERE sender_id = ?", [id]);
+    await db.run("UPDATE friend_requests SET status = 'accepted' WHERE sender_id = ? AND user_id = ?", 
+      [id, userId]
+    );
 
     res.json({ message: "Friend request accepted.", status: "accepted" });
   } catch (err) {
