@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import EventCard from "../components/Events/EventCard";
 import {
   Box,
@@ -6,32 +6,31 @@ import {
   IconButton,
   Grid,
   Paper,
-  Card,
-  CardContent,
-  Chip,
   Button,
+  Snackbar,
+  Alert,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import {
   ChevronLeft as ChevronLeftIcon,
   ChevronRight as ChevronRightIcon,
-  Computer,
 } from "@mui/icons-material";
-
 import { API_BASE_URL } from "../constants/constants";
 
 interface Event {
   event_id: number;
   club_id: number;
   title: string;
-  date: string;
+  date: Date;
   room: string;
-  incentives?: string;
-  // Adding computed properties for UI
+  incentives: string[];
   club?: string;
   time?: string;
   attending?: number;
   tags?: string[];
   favorite?: boolean;
+  notified?: boolean;
 }
 
 const CalendarPage: React.FC = () => {
@@ -40,8 +39,19 @@ const CalendarPage: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showNotification, setShowNotification] = useState(false);
+  const [notifications, setNotifications] = useState<
+    {
+      id: number;
+      message: string;
+      acknowledged: boolean;
+    }[]
+  >([]);
 
-  const fetchEvents = async () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md")); // md = 900px
+
+  const fetchEvents = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`${API_BASE_URL}/events`, {
@@ -50,25 +60,23 @@ const CalendarPage: React.FC = () => {
           "Content-Type": "application/json",
         },
       });
+
       if (!response.ok) {
         throw new Error("Failed to fetch events");
       }
+
       const data = await response.json();
 
-      // Transform the API data to match our UI needs
       const transformedEvents = data.data.map((event: Event) => ({
         ...event,
-        // Convert the date string to a Date object for easier comparison
         date: new Date(event.date),
-        // Extract time from the date string (might need to adjust this based on date format)
         time: new Date(event.date).toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
         }),
-        // Add default values for UI elements
         club: `Club ${event.club_id}`,
         attending: 0,
-        tags: event.incentives ? [event.incentives] : [],
+        tags: Array.isArray(event.incentives) ? event.incentives : [],
       }));
 
       setEvents(transformedEvents);
@@ -79,11 +87,61 @@ const CalendarPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  const checkUpcomingEvents = useCallback(() => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+
+    const upcomingEvents = events.filter((event) => {
+      const eventDate = new Date(event.date);
+      eventDate.setHours(0, 0, 0, 0);
+      return eventDate.getTime() === tomorrow.getTime() && !event.notified;
+    });
+
+    if (upcomingEvents.length > 0) {
+      // Clear existing notifications first
+      setNotifications([]);
+
+      const newNotifications = upcomingEvents
+        .filter((event) => !event.notified) // Only add if not already notified
+        .map((event) => ({
+          id: event.event_id,
+          message: `Reminder: "${event.title}" is tomorrow at ${event.time}`,
+          acknowledged: false,
+        }));
+
+      if (newNotifications.length > 0) {
+        setNotifications(newNotifications); // Replace instead of append
+
+        setEvents((prev) =>
+          prev.map((event) =>
+            upcomingEvents.some((e) => e.event_id === event.event_id)
+              ? { ...event, notified: true }
+              : event
+          )
+        );
+      }
+    }
+  }, [events]);
+
+  const handleDismissNotification = (id: number) => {
+    setNotifications((prev) =>
+      prev.filter((notification) => notification.id !== id)
+    );
   };
 
   useEffect(() => {
     fetchEvents();
-  }, []);
+  }, [fetchEvents]);
+
+  useEffect(() => {
+    checkUpcomingEvents();
+    const interval = setInterval(checkUpcomingEvents, 3600000); // Check every hour
+
+    return () => clearInterval(interval);
+  }, [checkUpcomingEvents]);
 
   // Monthly view functions
   const getPreviousMonthDays = (year: number, month: number): number[] => {
@@ -220,10 +278,16 @@ const CalendarPage: React.FC = () => {
     const endDate = new Date(startDate);
     endDate.setDate(startDate.getDate() + 6);
 
-    return events.filter((event) => {
-      const eventDate = new Date(event.date);
-      return eventDate >= startDate && eventDate <= endDate;
-    });
+    return events
+      .filter((event) => {
+        const eventDate = new Date(event.date);
+        return eventDate >= startDate && eventDate <= endDate;
+      })
+      .sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return dateA.getTime() - dateB.getTime();
+      });
   };
 
   if (loading) {
@@ -258,9 +322,9 @@ const CalendarPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3, maxWidth: 1400, margin: "0 auto", mt: 8 }}>
-      <Grid container spacing={3}>
-        {/* Left Column - Calendar */}
-        <Grid item xs={8}>
+      <Grid container spacing={3} direction={isMobile ? "column" : "row"}>
+        {/* Calendar */}
+        <Grid item xs={12} md={8}>
           {/* Calendar Header */}
           <Box
             sx={{
@@ -295,38 +359,50 @@ const CalendarPage: React.FC = () => {
                 alignItems: "center",
               }}
             >
-              <Grid container spacing={1} sx={{ maxWidth: 700 }}>
+              <Grid container spacing={0.5} sx={{ maxWidth: 500 }}>
                 {/* Day headers */}
                 {days.map((day) => (
-                  <Grid item xs={1} key={day} sx={{ textAlign: "center" }}>
+                  <Grid
+                    item
+                    xs={12 / 7}
+                    key={day}
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
                     <Typography sx={{ fontWeight: "bold" }}>{day}</Typography>
                   </Grid>
                 ))}
 
                 {/* Calendar days */}
                 {getCalendarDays(date).map((week, weekIndex) => (
-                  <Grid container item spacing={1} key={weekIndex}>
+                  <Grid container item spacing={0} key={weekIndex}>
                     {week.map(({ day, isCurrentMonth }, dayIndex) => (
                       <Grid
                         item
-                        xs={1}
+                        xs={12 / 7}
                         key={dayIndex}
-                        sx={{ textAlign: "center" }}
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          py: 0.5,
+                        }}
                       >
                         <Paper
                           elevation={0}
                           sx={{
-                            p: 1,
                             backgroundColor: isToday(day, isCurrentMonth)
                               ? "#e3f2fd"
                               : "transparent",
                             borderRadius: "50%",
-                            width: 40,
-                            height: 40,
+                            width: 36,
+                            height: 36,
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            margin: "0 auto",
                             position: "relative",
                             opacity: isCurrentMonth ? 1 : 0.4,
                             cursor: "pointer",
@@ -390,55 +466,123 @@ const CalendarPage: React.FC = () => {
         </Grid>
 
         {/* Right Column - Upcoming Events */}
-        <Grid item xs={4}>
+        <Grid item xs={12} md={4}>
           {clickedDate && (
             <Paper elevation={2} sx={{ p: 3, backgroundColor: "#fff" }}>
-              <Typography variant="h6" sx={{ mb: 1 }}>
-                Upcoming Events
-              </Typography>
-              <Typography
-                variant="subtitle1"
-                color="textSecondary"
-                sx={{ mb: 2 }}
+              {/* Fixed Header */}
+              <Box
+                sx={{
+                  position: "sticky",
+                  top: 0,
+                  backgroundColor: "#fff",
+                  pb: 2,
+                }}
               >
-                {clickedDate.toLocaleDateString()} -{" "}
-                {new Date(
-                  new Date(clickedDate).setDate(clickedDate.getDate() + 6)
-                ).toLocaleDateString()}
-              </Typography>
-              {getEventsInRange(clickedDate, events).length > 0 ? (
-                getEventsInRange(clickedDate, events).map((event) => (
-                  <EventCard
-                    key={event.event_id}
-                    id={event.event_id}
-                    club={event.club || ""}
-                    title={event.title}
-                    date={new Date(event.date).toDateString()}
-                    room={event.room}
-                    favorite={event.favorite || false}
-                    incentives={
-                      Array.isArray(event.incentives) ? event.incentives : []
-                    }
-                    toggleFavorite={(id) => {
-                      setEvents((prevEvents) =>
-                        prevEvents.map((e) =>
-                          e.event_id === id
-                            ? { ...e, favorite: !e.favorite }
-                            : e
-                        )
-                      );
-                    }}
-                  />
-                ))
-              ) : (
-                <Typography color="textSecondary">
-                  No upcoming events for this week
+                <Typography variant="h6" sx={{ mb: 1 }}>
+                  Upcoming Events
                 </Typography>
-              )}
+                <Typography
+                  variant="subtitle1"
+                  color="textSecondary"
+                  sx={{ mb: 2 }}
+                >
+                  {clickedDate.toLocaleDateString()} -{" "}
+                  {new Date(
+                    new Date(clickedDate).setDate(clickedDate.getDate() + 6)
+                  ).toLocaleDateString()}
+                </Typography>
+              </Box>
+
+              {/* Scrollable Content */}
+              <Box
+                sx={{
+                  maxHeight: "60vh",
+                  overflowY: "auto",
+                  "&::-webkit-scrollbar": {
+                    width: "8px",
+                  },
+                  "&::-webkit-scrollbar-track": {
+                    background: "#f1f1f1",
+                  },
+                  "&::-webkit-scrollbar-thumb": {
+                    background: "#888",
+                    borderRadius: "4px",
+                  },
+                  "&::-webkit-scrollbar-thumb:hover": {
+                    background: "#555",
+                  },
+                }}
+              >
+                {getEventsInRange(clickedDate, events).length > 0 ? (
+                  getEventsInRange(clickedDate, events).map((event) => (
+                    <EventCard
+                      key={event.event_id}
+                      id={event.event_id}
+                      club={event.club || ""}
+                      title={event.title}
+                      date={new Date(event.date).toDateString()}
+                      room={event.room}
+                      favorite={event.favorite || false}
+                      incentives={
+                        Array.isArray(event.incentives) ? event.incentives : []
+                      }
+                      toggleFavorite={(id) => {
+                        setEvents((prevEvents) =>
+                          prevEvents.map((e) =>
+                            e.event_id === id
+                              ? { ...e, favorite: !e.favorite }
+                              : e
+                          )
+                        );
+                      }}
+                    />
+                  ))
+                ) : (
+                  <Typography color="textSecondary">
+                    No upcoming events for this week
+                  </Typography>
+                )}
+              </Box>
             </Paper>
           )}
         </Grid>
       </Grid>
+      {notifications.map((notification) => (
+        <Snackbar
+          key={notification.id}
+          open={true}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          sx={{
+            position: "fixed",
+            mt: notifications.indexOf(notification) * 80,
+          }}
+        >
+          <Alert
+            severity="info"
+            sx={{
+              width: "100%",
+              backgroundColor: "#fff",
+              border: "1px solid #2196f3",
+              "& .MuiAlert-message": {
+                flex: 1,
+              },
+            }}
+            action={
+              <Box sx={{ display: "flex", gap: 1 }}>
+                <Button
+                  color="primary"
+                  size="small"
+                  onClick={() => handleDismissNotification(notification.id)}
+                >
+                  Dismiss
+                </Button>
+              </Box>
+            }
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      ))}
     </Box>
   );
 };
