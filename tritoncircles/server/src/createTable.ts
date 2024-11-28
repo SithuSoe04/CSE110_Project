@@ -116,7 +116,7 @@ const initDB = async () => {
       FOREIGN KEY(event_id) REFERENCES events(event_id) ON DELETE CASCADE,
       PRIMARY KEY(friend_id, event_id)
     );
-  `);
+    `);
 
   // Seed the clubs table with 100 clubs
   const clubs = [
@@ -134,54 +134,8 @@ const initDB = async () => {
       [club.name, club.description, club.link]
     );
   }
-
-
-  // const friendRequests = [
-  //   {
-  //     request_id: 1,
-  //     sender_id: 1,
-  //     sender_name: "Bob",
-  //     user_id: 7,
-  //     status: "pending",
-  //     message: "Looking forward to collaborating on projects!",
-  //     created_at: "2024-11-02 09:15:00"
-  //   },
-  //   {
-  //     request_id: 2,
-  //     sender_id: 2,
-  //     sender_name: "Charlie",
-  //     user_id: 7,
-  //     status: "pending",
-  //     message: "Hi, I think we have mutual interests.",
-  //     created_at: "2024-11-03 17:45:00"
-  //   },
-  //   {
-  //     request_id: 3, 
-  //     sender_id: 3,
-  //     sender_name: "Diana",
-  //     user_id: 7,
-  //     status: "pending",
-  //     message: "Hello! I'd like to add you to my network.",
-  //     created_at: "2024-11-04 11:00:00"
-  //   }
-  // ];
   
-  // // Insert the sample data into the database
-  // for (const request of friendRequests) {
-  //   await db.run(
-  //     `INSERT INTO friend_requests (request_id, sender_id, sender_name, user_id, status, message, created_at)
-  //      VALUES (?, ?, ?, ?, ?, ?, ?)`,
-  //     [
-  //       request.request_id,
-  //       request.sender_id,
-  //       request.sender_name,
-  //       request.user_id,
-  //       request.status,
-  //       request.message,
-  //       request.created_at
-  //     ]
-  //   );
-  // }
+
   
   // const friendsInterestedEvents = [
   //   {
@@ -207,9 +161,7 @@ const initDB = async () => {
   //   );
   // }
   
-  // console.log("Sample friends' interested events added to the database.");  
 
-  // console.log("Sample friend requests added to the database.");
   
   console.log("Seeded 100 clubs into the database");
 
