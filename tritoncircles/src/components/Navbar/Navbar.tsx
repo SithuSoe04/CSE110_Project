@@ -13,7 +13,12 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import { useAuth } from '../../context/AuthContext';
+import { useState } from 'react';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 interface Props {
   window?: () => Window;
@@ -25,6 +30,24 @@ const navItems = ['Events', 'Calendar', 'Clubs', 'Friends', 'Profile'];
 export default function NavBar(props: Props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null> (null);
+  const open = Boolean(anchorEl);
+  const navigate = useNavigate();
+  const {setIsAuthenticated} = useAuth();
+
+  const handleMenu = (event:React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem('user_id');
+    navigate('/login');
+  };
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
@@ -39,7 +62,7 @@ export default function NavBar(props: Props) {
       </Typography>
       <Divider />
       <List>
-        {navItems.map((item) => (
+        {navItems.filter(item => item !== 'Profile').map((item) => (
           <ListItem key={item} disablePadding>
             <ListItemButton sx={{ textAlign: 'center' }}>
             <Link to={`/${item.toLowerCase()}`} style={{ textDecoration: 'none', color: 'inherit' }}>
@@ -78,13 +101,34 @@ export default function NavBar(props: Props) {
             </Link>
           </Typography>
           <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-            {navItems.map((item) => (
+            {navItems.filter(item => item !== "Profile").map((item) => (
             <Button key={item} sx={{ color: "#fff" }}>
                 <Link to={`/${item.toLowerCase()}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                     <ListItemText primary={item} />
                 </Link>
             </Button>
             ))}
+            <Button
+              sx={{color: "#fff"}}
+              onClick = {handleMenu}
+              aria-controls = "profile-menu"
+              aria-haspopup = "true"
+              endIcon = {<ArrowDropDownIcon />}
+            >
+              <ListItemText primary="Profile" />
+            </Button>
+            <Menu 
+              id="profile-menu"
+              anchorEl = {anchorEl}
+              open={open}
+              onClose = {handleClose}
+            >
+              <MenuItem onClick = {() => {
+                handleClose();
+                navigate('/profile');
+              }}>View Profile</MenuItem>
+              <MenuItem onClick={handleLogout}>Logout</MenuItem>
+            </Menu>
           </Box>
         </Toolbar>
       </AppBar>

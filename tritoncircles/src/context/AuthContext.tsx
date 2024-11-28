@@ -13,6 +13,12 @@ export const AuthProvider: React.FC<{ children : React.ReactNode}> = ({children}
         return storedAuth === 'true';
     });
 
+    const logout = () => {
+        setIsAuthenticated(false);
+        localStorage.removeItem('user_id');
+        localStorage.removeItem('isAuthenticated');
+    };
+
     useEffect(() => {
         localStorage.setItem('isAuthenticated', String(isAuthenticated));
     }, [isAuthenticated]);

@@ -53,6 +53,7 @@ const Security = () => {
                 console.log('User registration finalized successfully', finalData);
                 localStorage.setItem('user_id', finalData.user_id);
                 setIsAuthenticated(true);
+                localStorage.removeItem('tempId');
                 navigate('/profile');
             }
             else{
