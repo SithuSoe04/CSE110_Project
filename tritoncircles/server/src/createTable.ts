@@ -1,6 +1,10 @@
 import sqlite3 from "sqlite3";
 import { open } from "sqlite";
 
+async function resetAutoIncrement(db: sqlite3.Database, tableName: string) {
+    await db.run(`DELETE FROM sqlite_sequence WHERE name='${tableName}';`);
+  }
+
 const initDB = async () => {
   // Open the database connection
   const db = await open({
@@ -19,6 +23,14 @@ const initDB = async () => {
     DELETE FROM friends_interested_events;
   `);
 
+  await db.exec(`DELETE FROM sqlite_sequence WHERE name='users';`);
+  await db.exec(`DELETE FROM sqlite_sequence WHERE name='events';`);
+  await db.exec(`DELETE FROM sqlite_sequence WHERE name='clubs';`);
+  await db.exec(`DELETE FROM sqlite_sequence WHERE name='event_favorites';`);
+  await db.exec(`DELETE FROM sqlite_sequence WHERE name='club_favorites';`);
+  await db.exec(`DELETE FROM sqlite_sequence WHERE name='friend_requests';`);
+  await db.exec(`DELETE FROM sqlite_sequence WHERE name='friends';`);
+  await db.exec(`DELETE FROM sqlite_sequence WHERE name='friends_interested_events';`);
 
   await db.exec(`
    CREATE TABLE IF NOT EXISTS users (
@@ -119,21 +131,21 @@ const initDB = async () => {
     `);
 
   // Seed the clubs table with 100 clubs
-  const clubs = [
-    { name: "Filipino Student Association (FSA)", description: "Celebrates Filipino culture and community.", link: "https://studentorg.ucsd.edu/Home/Details/17095" },
-    { name: "Finance Club", description: "Supports students pursuing careers in finance with resources and mentorship.", link: "https://studentorg.ucsd.edu/Home/Details/17096" },
-    { name: "Fire Spinners Club", description: "Teaches and performs the art of fire spinning and flow arts.", link: "https://studentorg.ucsd.edu/Home/Details/17097" },
-    { name: "Formula SAE", description: "Designs and builds race cars for national competitions.", link: "https://studentorg.ucsd.edu/Home/Details/17098" },
-    { name: "French Club", description: "Celebrates French culture and language with events and activities.", link: "https://studentorg.ucsd.edu/Home/Details/17099" },
-    { name: "Game Development Club", description: "Connects students interested in designing and building video games.", link: "https://studentorg.ucsd.edu/Home/Details/17100" }
-  ];
+//   const clubs = [
+//     { name: "Filipino Student Association (FSA)", description: "Celebrates Filipino culture and community.", link: "https://studentorg.ucsd.edu/Home/Details/17095" },
+//     { name: "Finance Club", description: "Supports students pursuing careers in finance with resources and mentorship.", link: "https://studentorg.ucsd.edu/Home/Details/17096" },
+//     { name: "Fire Spinners Club", description: "Teaches and performs the art of fire spinning and flow arts.", link: "https://studentorg.ucsd.edu/Home/Details/17097" },
+//     { name: "Formula SAE", description: "Designs and builds race cars for national competitions.", link: "https://studentorg.ucsd.edu/Home/Details/17098" },
+//     { name: "French Club", description: "Celebrates French culture and language with events and activities.", link: "https://studentorg.ucsd.edu/Home/Details/17099" },
+//     { name: "Game Development Club", description: "Connects students interested in designing and building video games.", link: "https://studentorg.ucsd.edu/Home/Details/17100" }
+//   ];
 
-  for (const club of clubs) {
-    await db.run(
-      "INSERT INTO clubs (name, description, link) VALUES (?, ?, ?)",
-      [club.name, club.description, club.link]
-    );
-  }
+//   for (const club of clubs) {
+//     await db.run(
+//       "INSERT INTO clubs (name, description, link) VALUES (?, ?, ?)",
+//       [club.name, club.description, club.link]
+//     );
+//   }
   
 
   

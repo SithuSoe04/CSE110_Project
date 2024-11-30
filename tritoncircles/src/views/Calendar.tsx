@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import EventCard from "../components/Events/EventCard";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Typography,
@@ -11,6 +10,10 @@ import {
   Alert,
   useTheme,
   useMediaQuery,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
 } from "@mui/material";
 import {
   ChevronLeft as ChevronLeftIcon,
@@ -33,6 +36,17 @@ interface Event {
   notified?: boolean;
 }
 
+interface Club {
+  club_id: number;
+  name: string;
+  description: string;
+  link: string;
+}
+
+interface User {
+  user_id: number;
+}
+
 const CalendarPage: React.FC = () => {
   const [date, setDate] = useState<Date>(new Date());
   const [clickedDate, setClickedDate] = useState<Date>(new Date());
@@ -47,47 +61,108 @@ const CalendarPage: React.FC = () => {
       acknowledged: boolean;
     }[]
   >([]);
+  const [clubs, setClubs] = useState<Club[]>([]);
+  const [clubsLoaded, setClubsLoaded] = useState<boolean>(false);
+  const userId = parseInt(localStorage.getItem("user_id") || "1");
 
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md")); // md = 900px
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  const fetchEvents = useCallback(async () => {
+  const fetchClubs = useCallback(async () => {
     try {
-      setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/events`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      console.log("Fetching clubs..."); // Debug log
+      const response = await fetch(
+        `${API_BASE_URL}/api/clubs?userId=${userId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch events");
+        throw new Error(`Failed to fetch clubs: ${response.status}`);
       }
 
       const data = await response.json();
+      setClubs(data.clubs);
+      setClubsLoaded(true);
+    } catch (err) {
+      console.error("Error fetching clubs:", err);
+      setError("Failed to fetch clubs");
+    }
+  }, [userId]);
 
-      const transformedEvents = data.data.map((event: Event) => ({
-        ...event,
-        date: new Date(event.date),
-        time: new Date(event.date).toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-        club: `Club ${event.club_id}`,
-        attending: 0,
-        tags: Array.isArray(event.incentives) ? event.incentives : [],
-      }));
+  const fetchEvents = useCallback(async () => {
+    if (!clubsLoaded || clubs.length === 0) {
+      console.log("Clubs not loaded yet, skipping events fetch");
+      return;
+    }
+
+    try {
+      console.log("Fetching favorite events for user:", userId);
+      setLoading(true);
+
+      const response = await fetch(
+        `${API_BASE_URL}/favoriteevents?user_id=${userId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch favorite events: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Raw favorite events data:", data);
+
+      const transformedEvents = data.data.map((event: Event) => {
+        const eventDate = new Date(event.date);
+        const hours = eventDate.getHours();
+        const minutes = eventDate.getMinutes();
+        const period = hours >= 12 ? "PM" : "AM";
+        const formattedHours = hours % 12 || 12;
+        const formattedMinutes = minutes.toString().padStart(2, "0");
+        const timeString = `${formattedHours}:${formattedMinutes} ${period}`;
+
+        const club = clubs.find((c) => c.club_id === event.club_id);
+
+        return {
+          ...event,
+          date: eventDate,
+          time: timeString,
+          club: club?.name || "Unknown Club",
+          attending: 0,
+          favorite: true,
+          tags: Array.isArray(event.incentives) ? event.incentives : [],
+        };
+      });
 
       setEvents(transformedEvents);
       setError(null);
     } catch (err) {
-      setError("Failed to fetch events");
-      console.error("Error fetching events:", err);
+      console.error("Error fetching favorite events:", err);
+      setError("Failed to fetch favorite events");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [clubs, clubsLoaded, userId]);
+
+  useEffect(() => {
+    fetchClubs();
+  }, [fetchClubs]);
+
+  useEffect(() => {
+    if (clubsLoaded && clubs.length > 0) {
+      console.log("Clubs loaded, fetching events...");
+      fetchEvents();
+    }
+  }, [clubsLoaded, clubs, fetchEvents]);
 
   const checkUpcomingEvents = useCallback(() => {
     const tomorrow = new Date();
@@ -131,10 +206,6 @@ const CalendarPage: React.FC = () => {
       prev.filter((notification) => notification.id !== id)
     );
   };
-
-  useEffect(() => {
-    fetchEvents();
-  }, [fetchEvents]);
 
   useEffect(() => {
     checkUpcomingEvents();
@@ -241,7 +312,6 @@ const CalendarPage: React.FC = () => {
 
   const days: string[] = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-  // Function to check if a date is today
   const isToday = (
     checkDate: Date | number,
     isCurrentMonth: boolean = true
@@ -273,7 +343,6 @@ const CalendarPage: React.FC = () => {
     );
   };
 
-  // Add this helper function
   const getEventsInRange = (startDate: Date, events: Event[]): Event[] => {
     const endDate = new Date(startDate);
     endDate.setDate(startDate.getDate() + 6);
@@ -469,7 +538,6 @@ const CalendarPage: React.FC = () => {
         <Grid item xs={12} md={4}>
           {clickedDate && (
             <Paper elevation={2} sx={{ p: 3, backgroundColor: "#fff" }}>
-              {/* Fixed Header */}
               <Box
                 sx={{
                   position: "sticky",
@@ -493,68 +561,110 @@ const CalendarPage: React.FC = () => {
                 </Typography>
               </Box>
 
-              {/* Scrollable Content */}
-              <Box
-                sx={{
-                  maxHeight: "60vh",
-                  overflowY: "auto",
-                  "&::-webkit-scrollbar": {
-                    width: "8px",
-                  },
-                  "&::-webkit-scrollbar-track": {
-                    background: "#f1f1f1",
-                  },
-                  "&::-webkit-scrollbar-thumb": {
-                    background: "#888",
-                    borderRadius: "4px",
-                  },
-                  "&::-webkit-scrollbar-thumb:hover": {
-                    background: "#555",
-                  },
-                }}
-              >
-                {getEventsInRange(clickedDate, events).length > 0 ? (
-                  getEventsInRange(clickedDate, events).map((event) => (
-                    <EventCard
-                      key={event.event_id}
-                      id={event.event_id}
-                      club={event.club || ""}
-                      title={event.title}
-                      date={new Date(event.date).toDateString()}
-                      room={event.room}
-                      favorite={event.favorite || false}
-                      incentives={
-                        Array.isArray(event.incentives) ? event.incentives : []
-                      }
-                      toggleFavorite={(id) => {
-                        setEvents((prevEvents) =>
-                          prevEvents.map((e) =>
-                            e.event_id === id
-                              ? { ...e, favorite: !e.favorite }
-                              : e
-                          )
-                        );
-                      }}
-                    />
-                  ))
-                ) : (
-                  <Typography color="textSecondary">
-                    No upcoming events for this week
-                  </Typography>
-                )}
+              <Box sx={{ maxHeight: "60vh", overflowY: "auto" }}>
+                <List>
+                  {getEventsInRange(clickedDate, events).length > 0 ? (
+                    getEventsInRange(clickedDate, events).map(
+                      (event, index) => (
+                        <React.Fragment key={event.event_id}>
+                          <ListItem>
+                            <ListItemText
+                              primary={event.title}
+                              secondary={
+                                <>
+                                  <Typography component="span" variant="body2">
+                                    {event.club} •{" "}
+                                    {new Date(event.date).toLocaleDateString()}
+                                  </Typography>
+                                  <br />
+                                  <Typography
+                                    component="span"
+                                    variant="body2"
+                                    color="textSecondary"
+                                  >
+                                    {event.time} • Room {event.room}
+                                  </Typography>
+                                </>
+                              }
+                            />
+                          </ListItem>
+                          {index <
+                            getEventsInRange(clickedDate, events).length -
+                              1 && <Divider />}
+                        </React.Fragment>
+                      )
+                    )
+                  ) : (
+                    <Typography color="textSecondary">
+                      No upcoming events for this week
+                    </Typography>
+                  )}
+                </List>
               </Box>
             </Paper>
           )}
         </Grid>
       </Grid>
-      {notifications.map((notification) => (
+      <Box
+        sx={{
+          position: "fixed",
+          top: 24,
+          right: 24,
+          zIndex: 2000,
+          display: "flex",
+          flexDirection: "column",
+          gap: 2, // 16px spacing between notifications
+        }}
+      >
+        {notifications.map((notification) => (
+          <Alert
+            key={notification.id}
+            severity="info"
+            sx={{
+              backgroundColor: "#fff",
+              border: "1px solid #2196f3",
+              width: "400px",
+              "& .MuiAlert-message": {
+                flex: 1,
+              },
+              "& .MuiAlert-action": {
+                display: "flex",
+                alignItems: "center", // Center vertically
+                padding: "0 8px", // Add some padding
+              },
+            }}
+            action={
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  height: "100%",
+                  gap: 1,
+                }}
+              >
+                <Button
+                  color="primary"
+                  size="small"
+                  onClick={() => handleDismissNotification(notification.id)}
+                >
+                  Dismiss
+                </Button>
+              </Box>
+            }
+          >
+            {notification.message}
+          </Alert>
+        ))}
+      </Box>
+      {/* {notifications.map((notification, index) => (
         <Snackbar
           key={notification.id}
           open={true}
           anchorOrigin={{ vertical: "top", horizontal: "right" }}
           sx={{
             position: "fixed",
-            mt: notifications.indexOf(notification) * 80,
+            top: `${index * 80 + 24}px`, // 24px initial offset, then 80px spacing between notifications
+            right: 24,
           }}
         >
           <Alert
@@ -582,7 +692,7 @@ const CalendarPage: React.FC = () => {
             {notification.message}
           </Alert>
         </Snackbar>
-      ))}
+      ))} */}
     </Box>
   );
 };
