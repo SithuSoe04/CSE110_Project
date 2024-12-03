@@ -12,25 +12,25 @@ const initDB = async () => {
     driver: sqlite3.Database,
   });
 
-  // await db.exec(`
-  //   DELETE FROM users;
-  //   DELETE FROM events;
-  //   DELETE FROM clubs;
-  //   DELETE FROM event_favorites;
-  //   DELETE FROM club_favorites;
-  //   DELETE FROM friend_requests;
-  //   DELETE FROM friends;
-  //   DELETE FROM friends_interested_events;
-  // `);
+  await db.exec(`
+    DELETE FROM users;
+    DELETE FROM events;
+    DELETE FROM clubs;
+    DELETE FROM event_favorites;
+    DELETE FROM club_favorites;
+    DELETE FROM friend_requests;
+    DELETE FROM friends;
+    DELETE FROM friends_interested_events;
+  `);
 
-  // await db.exec(`DELETE FROM sqlite_sequence WHERE name='users';`);
-  // await db.exec(`DELETE FROM sqlite_sequence WHERE name='events';`);
-  // await db.exec(`DELETE FROM sqlite_sequence WHERE name='clubs';`);
-  // await db.exec(`DELETE FROM sqlite_sequence WHERE name='event_favorites';`);
-  // await db.exec(`DELETE FROM sqlite_sequence WHERE name='club_favorites';`);
-  // await db.exec(`DELETE FROM sqlite_sequence WHERE name='friend_requests';`);
-  // await db.exec(`DELETE FROM sqlite_sequence WHERE name='friends';`);
-  // await db.exec(`DELETE FROM sqlite_sequence WHERE name='friends_interested_events';`);
+  await db.exec(`DELETE FROM sqlite_sequence WHERE name='users';`);
+  await db.exec(`DELETE FROM sqlite_sequence WHERE name='events';`);
+  await db.exec(`DELETE FROM sqlite_sequence WHERE name='clubs';`);
+  await db.exec(`DELETE FROM sqlite_sequence WHERE name='event_favorites';`);
+  await db.exec(`DELETE FROM sqlite_sequence WHERE name='club_favorites';`);
+  await db.exec(`DELETE FROM sqlite_sequence WHERE name='friend_requests';`);
+  await db.exec(`DELETE FROM sqlite_sequence WHERE name='friends';`);
+  await db.exec(`DELETE FROM sqlite_sequence WHERE name='friends_interested_events';`);
 
   await db.exec(`
    CREATE TABLE IF NOT EXISTS users (
