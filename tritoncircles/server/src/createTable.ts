@@ -19,6 +19,15 @@ const initDB = async () => {
     DELETE FROM friends_interested_events;
   `);
 
+  await db.exec(`DELETE FROM sqlite_sequence WHERE name='users';`);
+  await db.exec(`DELETE FROM sqlite_sequence WHERE name='events';`);
+  await db.exec(`DELETE FROM sqlite_sequence WHERE name='clubs';`);
+  await db.exec(`DELETE FROM sqlite_sequence WHERE name='event_favorites';`);
+  await db.exec(`DELETE FROM sqlite_sequence WHERE name='club_favorites';`);
+  await db.exec(`DELETE FROM sqlite_sequence WHERE name='friend_requests';`);
+  await db.exec(`DELETE FROM sqlite_sequence WHERE name='friends';`);
+  await db.exec(`DELETE FROM sqlite_sequence WHERE name='friends_interested_events';`);
+
 
   await db.exec(`
    CREATE TABLE IF NOT EXISTS users (
@@ -118,6 +127,26 @@ const initDB = async () => {
     );
     `);
 
+
+    // Seed the events table with sample data
+  const events = [
+    { club_id: 2, title: "Tech Talk", date: "2024-12-15 10:00:00", room: "Tech Hall A", incentives: "Free snacks" },
+    { club_id: 2, title: "Finance Workshop", date: "2024-12-16 14:00:00", room: "Finance Room B", incentives: "Networking Opportunities" },
+    { club_id: 1, title: "Coding Bootcamp", date: "2024-12-17 09:00:00", room: "Lab C", incentives: "Certificates of Completion" },
+    { club_id: 1, title: "AI Conference", date: "2024-12-18 11:00:00", room: "Main Auditorium", incentives: "Expert Talks" },
+    { club_id: 2, title: "Holiday Party", date: "2024-12-20 19:00:00", room: "Event Hall D", incentives: "Free Gifts" }
+  ];
+
+  for (const event of events) {
+    await db.run(
+      "INSERT INTO events (club_id, title, date, room, incentives) VALUES (?, ?, ?, ?, ?)",
+      [event.club_id, event.title, event.date, event.room, event.incentives]
+    );
+  }
+
+  console.log("Seeded events into the database");
+
+
   // Seed the clubs table with 100 clubs
   const clubs = [
     { name: "Filipino Student Association (FSA)", description: "Celebrates Filipino culture and community.", link: "https://studentorg.ucsd.edu/Home/Details/17095" },
@@ -134,35 +163,7 @@ const initDB = async () => {
       [club.name, club.description, club.link]
     );
   }
-  
 
-  
-  // const friendsInterestedEvents = [
-  //   {
-  //     friend_id: 1, // Friend ID referring to "Bob"
-  //     event_id: 1  // Refers to "FSA Cultural Night"
-  //   },
-  //   {
-  //     friend_id: 1, // Friend ID referring to "Bob"
-  //     event_id: 3  // Refers to "Fire Spinning Workshop"
-  //   },
-  //   {
-  //     friend_id: 2, // Friend ID referring to "Charlie"
-  //     event_id: 2  // Refers to "Finance 101 Workshop"
-  //   }
-  // ];
-  
-  // // Insert the sample data into the database
-  // for (const interestedEvent of friendsInterestedEvents) {
-  //   await db.run(
-  //     `INSERT INTO friends_interested_events (friend_id, event_id)
-  //      VALUES (?, ?)`,
-  //     [interestedEvent.friend_id, interestedEvent.event_id]
-  //   );
-  // }
-  
-
-  
   console.log("Seeded 100 clubs into the database");
 
   console.log("Database initialized with tables:");

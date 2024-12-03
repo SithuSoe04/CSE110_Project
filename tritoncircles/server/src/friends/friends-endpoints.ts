@@ -38,5 +38,4 @@ export function createFriendsEndpoints(app: any, db: Database) {
   app.post("/friends/requests", async (req: Request, res: Response) => {
     sendRequests(req, res, db);
   });
-  
 }  

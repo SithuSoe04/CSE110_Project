@@ -9,8 +9,12 @@ export async function getAllFriendRequests(
 ) {
   try {
     // console.log("Fetching friend requests for user_id:", userId);
-    const friendRequests = await db.all(
-      "SELECT * FROM friend_requests WHERE user_id = ?",
+    const friendRequests = await db.all(`
+      SELECT fr.request_id, fr.sender_id, u.name AS sender_name, fr.status, fr.message, fr.created_at
+      FROM friend_requests fr
+      JOIN users u ON fr.sender_id = u.user_id
+      WHERE fr.user_id = ?`,
+      // "SELECT * FROM friend_requests WHERE user_id = ?",
       [userId]
     );
     // console.log("Friend requests result:", friendRequests); 

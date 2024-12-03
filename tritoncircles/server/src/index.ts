@@ -135,6 +135,7 @@ interface FavoriteRequest {
           details: error instanceof Error ? error.message : "Unknown error",
         });
       }
+    
     });
 
     // Initialize other endpoints
