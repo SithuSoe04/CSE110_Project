@@ -187,7 +187,8 @@ export async function getFriendsInterestedEvents(req: Request, res: Response, db
           friends
         WHERE 
           connection LIKE ? OR connection LIKE ?
-      );`,
+      )
+      AND u.private = 0;`,
       [`${userId}-%`, `%-${userId}`]
     );
     res.json(events);
