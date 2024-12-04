@@ -31,7 +31,6 @@ export const fetchFriendRequests = async () => {
   }
 };
 
-
 export const acceptRequest = async (friendRequestId: number) => {
   const userId = localStorage.getItem("user_id");
 
@@ -65,8 +64,6 @@ export const acceptRequest = async (friendRequestId: number) => {
   }
 };
 
-
-
 export const declineRequest = async (id: number) => {
   const user_id = localStorage.getItem("user_id");
 
@@ -99,37 +96,6 @@ export const declineRequest = async (id: number) => {
     return [];
   }
 };
-
-
-export const fetchFriendsInterestedEvents = async () => {
-  const user_id = localStorage.getItem("user_id");
-
-  if (!user_id) {
-    console.error("User is not logged in.");
-    return [];
-  }
-
-  try {
-    const response = await fetch(`${API_BASE_URL}/friends/interested-events?user_id=${user_id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      console.error("Error fetching friends' interested events:", await response.text());
-      return [];
-    }
-
-    const data = await response.json();
-    return data.data || []; // Ensure it always returns an array
-  } catch (err) {
-    console.error("Unexpected error fetching friends' interested events:", err);
-    return [];
-  }
-};
-
 
 export const sendFriendRequest = async (recipientId: string) => {
   const senderId = localStorage.getItem("user_id");
@@ -169,3 +135,51 @@ export const sendFriendRequest = async (recipientId: string) => {
   }
 };
 
+export const updateFriendsInterestedEvents = async (userId: string) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/friends/interested-events/update`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userId }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Error updating friends' interested events:", errorText);
+      throw new Error("Failed to update friends' interested events.");
+    }
+
+    const data = await response.json();
+    console.log("Friends' interested events updated successfully:", data);
+    return data;
+  } catch (err) {
+    console.error("Unexpected error updating friends' interested events:", err);
+    throw err;
+  }
+};
+
+export const fetchFriendsInterestedEvents = async (userId: string) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/friends/interested-events/${userId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Error fetching friends' interested events:", errorText);
+      throw new Error("Failed to fetch friends' interested events.");
+    }
+
+    const data = await response.json();
+    console.log("Fetched friends' interested events:", data);
+    return data;
+  } catch (err) {
+    console.error("Unexpected error fetching friends' interested events:", err);
+    throw err;
+  }
+};

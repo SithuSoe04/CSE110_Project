@@ -752,3 +752,195 @@ Fetches the user data for a given user ID.
 ```
 { "error": "Failed to fetch user" }
 ```
+
+# Friends 
+
+## Function: `getAllFriendRequests`
+
+### Description
+Fetches all friend requests for a specific user.
+
+### Parameters
+- `req: Request` - The HTTP request object containing query parameters, including `user_id`.
+- `res: Response` - The HTTP response object.
+- `db: Database` - The SQLite database instance.
+
+### Route Parameters
+- user_id (string): ID of the user whose friend requests are to be retrieved.
+
+### Responses
+- 200 OK: A list of friend requests.
+```
+  {
+    "request_id": number,
+    "sender_id": number,
+    "receiver_id": number,
+    "status": string,
+    "date_sent": string
+  }
+```
+- 400 Bad Request: Missing `user_id`.
+```json
+{ "error": "Missing user_id in query parameters." }
+```
+- 500 Internal Server Error: Database or server error.
+```json
+{ "error": "Failed to fetch friend requests: <error message>" }
+```
+
+## Function: `acceptFriendRequest`
+
+### Description
+Accepts a friend request by its ID.
+
+### Parameters
+- `req: Request` - The HTTP request object containing the `id` parameter in the URL path.
+- `res: Response` - The HTTP response object.
+- `db: Database` - The SQLite database instance.
+
+### Responses
+- 200 OK: Friend request accepted successfully.
+```json
+{ "message": "Friend request accepted successfully." }
+```
+- 404 Not Found: Friend request not found.
+```json
+{ "error": "Friend request not found." }
+```
+- 500 Internal Server Error: Database or server error.
+```json
+{ "error": "Failed to accept friend request: <error message>" }
+```
+
+### Function: `declineFriendRequest`
+
+### Description
+Declines a friend request by its ID.
+
+### Parameters
+- `req: Request` - The HTTP request object containing the `id` parameter in the URL path.
+- `res: Response` - The HTTP response object.
+- `db: Database` - The SQLite database instance.
+
+### Responses
+- 200 OK: Friend request declined successfully.
+```json
+{ "message": "Friend request declined successfully." }
+```
+- 404 Not Found: Friend request not found.
+```json
+{ "error": "Friend request not found." }
+```
+- 500 Internal Server Error: Database or server error.
+```json
+{ "error": "Failed to decline friend request: <error message>" }
+```
+
+### Function: `searchUsers`
+
+### Description
+Searches for users based on query parameters.
+
+### Parameters
+- `req: Request` - The HTTP request object containing query parameters for filtering users.
+- `res: Response` - The HTTP response object.
+- `db: Database` - The SQLite database instance.
+
+### Responses
+- 200 OK: A list of users matching the search criteria.
+```
+  {
+    "user_id": number,
+    "username": string,
+    "profile_picture": string
+  }
+```
+- 400 Bad Request: Missing required search parameters.
+```json
+{ "error": "Missing required search parameters." }
+```
+- 500 Internal Server Error: Database or server error.
+```json
+{ "error": "Failed to search users: <error message>" }
+```
+
+### Function: `sendRequests`
+
+### Description
+Sends a friend request to another user.
+
+### Parameters
+- `req: Request` - The HTTP request object containing the `sender_id` and `receiver_id` in the body.
+- `res: Response` - The HTTP response object.
+- `db: Database` - The SQLite database instance.
+
+### Responses
+- 201 Created: Friend request sent successfully.
+```json
+{ "message": "Friend request sent successfully." }
+```
+- 400 Bad Request: Missing required fields in the request body.
+```json
+{ "error": "Missing required fields." }
+```
+- 500 Internal Server Error: Database or server error.
+```json
+{ "error": "Failed to send friend request: <error message>" }
+```
+
+### Function: `updateFriendsInterestedEvents`
+
+### Description
+Updates the interested events of a user's friends.
+
+### Parameters
+- `req: Request` - The HTTP request object containing the `userId` in the body.
+- `res: Response` - The HTTP response object.
+- `db: Database` - The SQLite database instance.
+
+### Route Parameters
+- user_id (string): ID of the user whose friends' interested events are to be updated.
+
+### Responses
+- 200 OK: Friends' interested events updated successfully.
+```json
+{ "message": "Friends' interested events updated successfully." }
+```
+- 400 Bad Request: Missing `userId` in the request body.
+```json
+{ "error": "Missing userId in request body." }
+```
+- 500 Internal Server Error: Database or server error.
+```json
+{ "error": "Failed to update friends' interested events: <error message>" }
+```
+
+### Function: `getFriendsInterestedEvents`
+
+### Description
+Fetches the interested events of a user's friends.
+
+### Parameters
+- `req: Request` - The HTTP request object containing the `userId` parameter in the URL path.
+- `res: Response` - The HTTP response object.
+- `db: Database` - The SQLite database instance.
+
+### Responses
+- 200 OK: A list of interested events for the user's friends.
+```
+  {
+    "event_id": number,
+    "event_name": string,
+    "event_date": string,
+    "friend_id": number
+  }
+```
+- 404 Not Found: User or friends' events not found.
+```json
+{ "error": "User or friends' events not found." }
+```
+- 500 Internal Server Error: Database or server error.
+```json
+{ "error": "Failed to fetch friends' interested events: <error message>" }
+```
+

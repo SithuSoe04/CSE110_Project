@@ -28,15 +28,25 @@ const Clubs: React.FC = () => {
   const [clubs, setClubs] = useState<Club[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [snackbar, setSnackbar] = useState<SnackbarState>({ open: false, message: "" });
+  const [snackbar, setSnackbar] = useState<SnackbarState>({
+    open: false,
+    message: "",
+  });
   const [searchTerm, setSearchTerm] = useState<string>("");
+  //added
+  const [userId] = useState<number>(
+    parseInt(localStorage.getItem("user_id") || "1")
+  );
 
   const fetchClubs = async () => {
     try {
       setLoading(true);
       console.log("Fetching clubs...");
+
+      const response = await axios.get<{ clubs: Club[] }>(
+        `http://localhost:8080/api/clubs?userId=${userId}`
+      );
       
-      const response = await axios.get<{ clubs: Club[] }>("http://localhost:8080/api/clubs?userId=1");
       console.log("Raw response:", response.data);
 
       if (!response.data || !response.data.clubs) {
@@ -66,17 +76,21 @@ const Clubs: React.FC = () => {
   const handleToggleFavorite = async (clubId: number) => {
     try {
       console.log("Attempting to toggle favorite for club:", clubId);
-      
-      const response = await axios.post<{ success: boolean; message: string; error?: string }>(
+
+      const response = await axios.post<{
+        success: boolean;
+        message: string;
+        error?: string;
+      }>(
         "http://localhost:8080/api/clubs/favorite",
         {
-          userId: 1, // Replace with dynamic user ID as needed
+          userId: userId,
           clubId: clubId,
         },
         {
           headers: {
             "Content-Type": "application/json",
-          }
+          },
         }
       );
 
@@ -96,7 +110,9 @@ const Clubs: React.FC = () => {
           message: response.data.message || "Updated favorite status",
         });
       } else {
-        throw new Error(response.data.error || "Failed to update favorite status");
+        throw new Error(
+          response.data.error || "Failed to update favorite status"
+        );
       }
     } catch (err) {
       console.error("Error toggling favorite:", err);
@@ -117,9 +133,10 @@ const Clubs: React.FC = () => {
     setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
-  const filteredClubs = clubs.filter((club: Club) =>
-    club.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    club.description.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredClubs = clubs.filter(
+    (club: Club) =>
+      club.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      club.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const favoriteClubs = filteredClubs.filter((club: Club) => club.favorite);
@@ -127,7 +144,12 @@ const Clubs: React.FC = () => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="60vh"
+      >
         <CircularProgress />
       </Box>
     );
@@ -188,7 +210,8 @@ const Clubs: React.FC = () => {
         ) : (
           <Grid item xs={12}>
             <Typography variant="body1" color="text.secondary">
-              No favorite clubs yet. Click the heart icon to add clubs to your favorites.
+              No favorite clubs yet. Click the heart icon to add clubs to your
+              favorites.
             </Typography>
           </Grid>
         )}
@@ -215,7 +238,9 @@ const Clubs: React.FC = () => {
         ) : (
           <Grid item xs={12}>
             <Typography variant="body1" color="text.secondary">
-              {searchTerm ? "No clubs found matching your search." : "No clubs available."}
+              {searchTerm
+                ? "No clubs found matching your search."
+                : "No clubs available."}
             </Typography>
           </Grid>
         )}
