@@ -1,5 +1,6 @@
 import sqlite3 from "sqlite3";
 import { open } from "sqlite";
+import {eventData, recruitmentData, clubData} from './constants'
 
 const initDB = async () => {
   // Open the database connection

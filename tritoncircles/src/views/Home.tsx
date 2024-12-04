@@ -42,7 +42,11 @@ const Home = () => {
           <Box sx={{ fontWeight: "bold" }}>Interested Events</Box>
         </Typography>
         <Grid container spacing={2} mb={5}>
-        {favoriteEventsData?.map((data) => (
+        {favoriteEventsData.length === 0 ?
+          <Typography variant="body1" color="text.secondary">
+              No favorite events yet. Add events to your favorites in the events page to see your favorite events here.
+          </Typography> :       
+        favoriteEventsData?.map((data) => (
           <Grid size={3}><EventCard id={data.id} club={data.club_name} title={data.title} date={data.date} room={data.room} favorite={data.favorite} toggleFavorite={()=>{}} incentives={data.incentives}/>
           </Grid>
         ))}
@@ -50,11 +54,14 @@ const Home = () => {
         <Typography gutterBottom variant="h4">
           <Box sx={{ fontWeight: "bold" }}>Open Positions</Box>
         </Typography>
+        {recruitmentData.length === 0 ?  <Typography variant="body1" color="text.secondary" mb={5}>
+              No recruitment posts to display. Favorite some clubs to see their available position!
+          </Typography> :         
         <Grid container spacing={2} mb={5}>
           {recruitmentData.map(data => 
              <Grid size={3}><Recruitment id={data.id} club={data.club_name} position={data.title} date_posted={data.date_posted} deadline={data.deadline} application_link={data.application_link}/></Grid>
           )}
-        </Grid> 
+        </Grid>}
         <Typography gutterBottom variant="h4">
           <Box sx={{ fontWeight: "bold" }}>Frequently Asked Questions (FAQ)</Box>
         </Typography>

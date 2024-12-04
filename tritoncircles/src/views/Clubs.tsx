@@ -36,7 +36,7 @@ const Clubs: React.FC = () => {
       setLoading(true);
       console.log("Fetching clubs...");
       
-      const response = await axios.get<{ clubs: Club[] }>("http://localhost:8080/api/clubs");
+      const response = await axios.get<{ clubs: Club[] }>("http://localhost:8080/api/clubs?userId=1");
       console.log("Raw response:", response.data);
 
       if (!response.data || !response.data.clubs) {
