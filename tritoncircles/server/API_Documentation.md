@@ -767,8 +767,7 @@ Fetches all friend requests for a specific user.
 
 ### Responses
 - 200 OK: A list of friend requests.
-```json
-[
+```
   {
     "request_id": number,
     "sender_id": number,
@@ -776,7 +775,6 @@ Fetches all friend requests for a specific user.
     "status": string,
     "date_sent": string
   }
-]
 ```
 - 400 Bad Request: Missing `user_id`.
 ```json
