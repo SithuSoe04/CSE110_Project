@@ -9,8 +9,11 @@ export async function getAllFriendRequests(
 ) {
   try {
     // console.log("Fetching friend requests for user_id:", userId);
-    const friendRequests = await db.all(
-      "SELECT * FROM friend_requests WHERE user_id = ?",
+    const friendRequests = await db.all(`
+      SELECT fr.request_id, fr.sender_id, u.name AS sender_name, fr.status, fr.message, fr.created_at
+      FROM friend_requests fr
+      JOIN users u ON fr.sender_id = u.user_id
+      WHERE fr.user_id = ?`,
       [userId]
     );
     // console.log("Friend requests result:", friendRequests); 
@@ -22,12 +25,13 @@ export async function getAllFriendRequests(
 }
 
 export async function acceptFriendRequest(req: Request, res: Response, db: Database) {
-  const { id } = req.params;
+  const { id } = req.params; // request_id
   const userId = req.body.user_id;
 
   try {
+    // Check if the friend request exists and is pending
     const friendRequest = await db.get(
-      "SELECT * FROM friend_requests WHERE sender_id = ? AND user_id = ? AND status = 'pending'",
+      "SELECT * FROM friend_requests WHERE request_id = ? AND user_id = ? AND status = 'pending'",
       [id, userId]
     );
 
@@ -35,7 +39,8 @@ export async function acceptFriendRequest(req: Request, res: Response, db: Datab
       return res.status(404).json({ error: "Friend request not found or already processed." });
     }
 
-    const connection = `${friendRequest.sender_id}-${friendRequest.user_id}`;
+    // Create a unique connection string
+    const connection = `${Math.min(friendRequest.sender_id, friendRequest.user_id)}-${Math.max(friendRequest.sender_id, friendRequest.user_id)}`;
     const friendshipDate = new Date().toISOString();
 
     // Insert the friendship into the friends table
@@ -45,8 +50,9 @@ export async function acceptFriendRequest(req: Request, res: Response, db: Datab
     );
 
     // Update the friend request's status to "accepted"
-    await db.run("UPDATE friend_requests SET status = 'accepted' WHERE sender_id = ? AND user_id = ?", 
-      [id, userId]
+    await db.run(
+      "UPDATE friend_requests SET status = 'accepted' WHERE request_id = ?",
+      [id]
     );
 
     res.json({ message: "Friend request accepted.", status: "accepted" });
@@ -56,13 +62,12 @@ export async function acceptFriendRequest(req: Request, res: Response, db: Datab
   }
 }
 
-
 export async function declineFriendRequest(req: Request, res: Response, db: Database) {
   const { id } = req.params;
 
   try {
     // Update the friend request's status to "declined"
-    await db.run("UPDATE friend_requests SET status = 'declined' WHERE sender_id = ?", [id]);
+    await db.run("UPDATE friend_requests SET status = 'declined' WHERE request_id = ?", [id]);
 
     // Respond with success and updated status
     res.json({ message: "Friend request declined.", status: "declined" });
@@ -71,48 +76,6 @@ export async function declineFriendRequest(req: Request, res: Response, db: Data
     res.status(500).json({ error: "Failed to decline friend request." });
   }
 }
-
-
-export async function getFriendsInterestedEvents(req: Request, res: Response, db: Database) {
-  const userId = req.query.user_id;
-  
-    if (!userId) {
-      return res.status(400).json({ error: "Missing user_id query parameter" });
-    }
-  
-    try {
-    const userIdString = `${userId},`; // Matches connections where user_id is first
-    const reversedUserIdString = `,${userId}`; // Matches connections where user_id is second
-
-    const events = await db.all(
-      `
-      SELECT
-        fie.friend_id AS friendId,
-        u.name AS friendName, 
-        e.event_id AS id,
-        e.title,
-        e.date,
-        e.room, 
-        e.incentives, 
-        c.name AS clubName
-      FROM events e
-      JOIN friends_interested_events fie ON e.event_id = fie.event_id
-      JOIN friends f ON f.connection LIKE ? OR f.connection LIKE ?
-      JOIN users u ON u.user_id = fie.friend_id
-      JOIN clubs c ON e.club_id = c.club_id
-      WHERE fie.friend_id = CAST(SUBSTR(f.connection, INSTR(f.connection, ',') + 1) AS INTEGER)
-         OR fie.friend_id = CAST(SUBSTR(f.connection, 1, INSTR(f.connection, ',') - 1) AS INTEGER)
-      `,
-      [`${userIdString}%`, `%${reversedUserIdString}`]
-    );
-    
-      res.status(200).json({ data: events || [] }); 
-    } catch (err) {
-      console.error("Error fetching friends' interested events:", err);
-      res.status(500).json({ error: "Failed to fetch events." });
-    }
-}
-
 
 export async function searchUsers(req: Request, res: Response, db: Database) {
   const query = req.query.query as string;
@@ -180,3 +143,57 @@ export async function sendRequests(req: Request, res: Response, db: Database) {
     }
 }
 
+export async function updateFriendsInterestedEvents(userId: string, db: Database) {
+  try {
+    await db.run(
+      `INSERT INTO friends_interested_events (friend_id, event_id)
+       SELECT CAST(SUBSTR(connection, INSTR(connection, '-') + 1) AS INTEGER) AS friend_id, ef.event_id
+       FROM friends
+       JOIN event_favorites ef ON ef.user_id = CAST(SUBSTR(connection, INSTR(connection, '-') + 1) AS INTEGER)
+       WHERE connection LIKE '${userId}-%' OR connection LIKE '%-${userId}'
+       ON CONFLICT(friend_id, event_id) DO NOTHING;`
+    );
+
+    console.log(`Updated friends' interested events for user ID ${userId}`);
+  } catch (err) {
+    console.error("Error updating friends' interested events:", err);
+    throw err;
+  }
+}
+
+export async function getFriendsInterestedEvents(req: Request, res: Response, db: Database) {
+  const { userId } = req.params;
+  try {
+    const events = await db.all(
+      `SELECT 
+      e.event_id AS id,
+      e.title,
+      e.date,
+      e.room,
+      e.incentives,
+      u.user_id AS friendId,
+      u.name AS friendName
+    FROM 
+      friends_interested_events fe
+    JOIN 
+      events e ON fe.event_id = e.event_id
+    JOIN 
+      users u ON fe.friend_id = u.user_id
+    WHERE 
+      fe.friend_id IN (
+        SELECT 
+          CAST(SUBSTR(connection, INSTR(connection, '-') + 1) AS INTEGER)
+        FROM 
+          friends
+        WHERE 
+          connection LIKE ? OR connection LIKE ?
+      )
+      AND u.private = 0;`,
+      [`${userId}-%`, `%-${userId}`]
+    );
+    res.json(events);
+  } catch (err) {
+    console.error("Error fetching friends' interested events:", err);
+    res.status(500).json({ error: "Failed to fetch friends' interested events." });
+  }
+}
