@@ -8,16 +8,16 @@ const initDB = async () => {
     driver: sqlite3.Database,
   });
 
-  await db.exec(`
-    DELETE FROM users;
-    DELETE FROM events;
-    DELETE FROM clubs;
-    DELETE FROM event_favorites;
-    DELETE FROM club_favorites;
-    DELETE FROM friend_requests;
-    DELETE FROM friends;
-    DELETE FROM friends_interested_events;
-  `);
+  // await db.exec(`
+  //   DELETE FROM users;
+  //   DELETE FROM events;
+  //   DELETE FROM clubs;
+  //   DELETE FROM event_favorites;
+  //   DELETE FROM club_favorites;
+  //   DELETE FROM friend_requests;
+  //   DELETE FROM friends;
+  //   DELETE FROM friends_interested_events;
+  // `);
 
 
   await db.exec(`
@@ -32,7 +32,16 @@ const initDB = async () => {
       year VARCHAR(50),
       minor VARCHAR(50),
       securityQuestion VARCHAR(255),
-      securityAnswer VARCHAR(255)
+      securityAnswer VARCHAR(255),
+      bio TEXT,
+      profile_pic TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS user_interests(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_ID INTEGER,
+    interest TEXT,
+    FOREIGN KEY(user_id) REFERENCES users(user_id)
     );
 
     CREATE TABLE IF NOT EXISTS temp_users (
