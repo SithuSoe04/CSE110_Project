@@ -765,6 +765,9 @@ Fetches all friend requests for a specific user.
 - `res: Response` - The HTTP response object.
 - `db: Database` - The SQLite database instance.
 
+### Route Parameters
+- user_id (string): ID of the user whose friend requests are to be retrieved.
+
 ### Responses
 - 200 OK: A list of friend requests.
 ```
@@ -791,9 +794,9 @@ Fetches all friend requests for a specific user.
 Accepts a friend request by its ID.
 
 ### Parameters
-- `req`: Request - The HTTP request object containing the `id` parameter in the URL path.
-- `res`: Response - The HTTP response object.
-- `db`: Database - The SQLite database instance.
+- `req: Request` - The HTTP request object containing the `id` parameter in the URL path.
+- `res: Response` - The HTTP response object.
+- `db: Database` - The SQLite database instance.
 
 ### Responses
 - 200 OK: Friend request accepted successfully.
@@ -815,9 +818,9 @@ Accepts a friend request by its ID.
 Declines a friend request by its ID.
 
 ### Parameters
-- `req`: Request - The HTTP request object containing the `id` parameter in the URL path.
-- `res`: Response - The HTTP response object.
-- `db`: Database - The SQLite database instance.
+- `req: Request` - The HTTP request object containing the `id` parameter in the URL path.
+- `res: Response` - The HTTP response object.
+- `db: Database` - The SQLite database instance.
 
 ### Responses
 - 200 OK: Friend request declined successfully.
@@ -839,9 +842,9 @@ Declines a friend request by its ID.
 Searches for users based on query parameters.
 
 ### Parameters
-- `req`: Request - The HTTP request object containing query parameters for filtering users.
-- `res`: Response - The HTTP response object.
-- `db`: Database - The SQLite database instance.
+- `req: Request` - The HTTP request object containing query parameters for filtering users.
+- `res: Response` - The HTTP response object.
+- `db: Database` - The SQLite database instance.
 
 ### Responses
 - 200 OK: A list of users matching the search criteria.
@@ -869,9 +872,9 @@ Searches for users based on query parameters.
 Sends a friend request to another user.
 
 ### Parameters
-- `req`: Request - The HTTP request object containing the `sender_id` and `receiver_id` in the body.
-- `res`: Response - The HTTP response object.
-- `db`: Database - The SQLite database instance.
+- `req: Request` - The HTTP request object containing the `sender_id` and `receiver_id` in the body.
+- `res: Response` - The HTTP response object.
+- `db: Database` - The SQLite database instance.
 
 ### Responses
 - 201 Created: Friend request sent successfully.
@@ -893,9 +896,12 @@ Sends a friend request to another user.
 Updates the interested events of a user's friends.
 
 ### Parameters
-- `req`: Request - The HTTP request object containing the `userId` in the body.
-- `res`: Response - The HTTP response object.
-- `db`: Database - The SQLite database instance.
+- `req: Request` - The HTTP request object containing the `userId` in the body.
+- `res: Response` - The HTTP response object.
+- `db: Database` - The SQLite database instance.
+
+### Route Parameters
+- user_id (string): ID of the user whose friends' interested events are to be updated.
 
 ### Responses
 - 200 OK: Friends' interested events updated successfully.
@@ -917,9 +923,9 @@ Updates the interested events of a user's friends.
 Fetches the interested events of a user's friends.
 
 ### Parameters
-- `req`: Request - The HTTP request object containing the `userId` parameter in the URL path.
-- `res`: Response - The HTTP response object.
-- `db`: Database - The SQLite database instance.
+- `req: Request` - The HTTP request object containing the `userId` parameter in the URL path.
+- `res: Response` - The HTTP response object.
+- `db: Database` - The SQLite database instance.
 
 ### Responses
 - 200 OK: A list of interested events for the user's friends.
