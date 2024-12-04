@@ -68,10 +68,9 @@ const CalendarPage: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  //fetch clubs
   const fetchClubs = useCallback(async () => {
     try {
-      console.log("Fetching clubs...");
+      console.log("Fetching clubs..."); // Debug log
       const response = await fetch(
         `${API_BASE_URL}/api/clubs?userId=${userId}`,
         {
@@ -95,7 +94,6 @@ const CalendarPage: React.FC = () => {
     }
   }, [userId]);
 
-  //fetch events
   const fetchEvents = useCallback(async () => {
     if (!clubsLoaded || clubs.length === 0) {
       console.log("Clubs not loaded yet, skipping events fetch");
@@ -166,7 +164,6 @@ const CalendarPage: React.FC = () => {
     }
   }, [clubsLoaded, clubs, fetchEvents]);
 
-  //Check if any events are upcoming within a day and notify the user
   const checkUpcomingEvents = useCallback(() => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -179,10 +176,11 @@ const CalendarPage: React.FC = () => {
     });
 
     if (upcomingEvents.length > 0) {
+      // Clear existing notifications first
       setNotifications([]);
 
       const newNotifications = upcomingEvents
-        .filter((event) => !event.notified)
+        .filter((event) => !event.notified) // Only add if not already notified
         .map((event) => ({
           id: event.event_id,
           message: `Reminder: "${event.title}" is tomorrow at ${event.time}`,
@@ -190,7 +188,7 @@ const CalendarPage: React.FC = () => {
         }));
 
       if (newNotifications.length > 0) {
-        setNotifications(newNotifications);
+        setNotifications(newNotifications); // Replace instead of append
 
         setEvents((prev) =>
           prev.map((event) =>
@@ -335,7 +333,7 @@ const CalendarPage: React.FC = () => {
     }
   };
 
-  // Check if a date is the clicked date
+  // Function to check if a date is the clicked date
   const isClickedDate = (checkDate: number, checkMonth: number): boolean => {
     return (
       clickedDate !== null &&
@@ -345,7 +343,6 @@ const CalendarPage: React.FC = () => {
     );
   };
 
-  //Check if an event is within a week
   const getEventsInRange = (startDate: Date, events: Event[]): Event[] => {
     const endDate = new Date(startDate);
     endDate.setDate(startDate.getDate() + 6);
@@ -616,7 +613,7 @@ const CalendarPage: React.FC = () => {
           zIndex: 2000,
           display: "flex",
           flexDirection: "column",
-          gap: 2,
+          gap: 2, // 16px spacing between notifications
         }}
       >
         {notifications.map((notification) => (
@@ -632,8 +629,8 @@ const CalendarPage: React.FC = () => {
               },
               "& .MuiAlert-action": {
                 display: "flex",
-                alignItems: "center",
-                padding: "0 8px",
+                alignItems: "center", // Center vertically
+                padding: "0 8px", // Add some padding
               },
             }}
             action={
@@ -659,6 +656,43 @@ const CalendarPage: React.FC = () => {
           </Alert>
         ))}
       </Box>
+      {/* {notifications.map((notification, index) => (
+        <Snackbar
+          key={notification.id}
+          open={true}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          sx={{
+            position: "fixed",
+            top: `${index * 80 + 24}px`, // 24px initial offset, then 80px spacing between notifications
+            right: 24,
+          }}
+        >
+          <Alert
+            severity="info"
+            sx={{
+              width: "100%",
+              backgroundColor: "#fff",
+              border: "1px solid #2196f3",
+              "& .MuiAlert-message": {
+                flex: 1,
+              },
+            }}
+            action={
+              <Box sx={{ display: "flex", gap: 1 }}>
+                <Button
+                  color="primary"
+                  size="small"
+                  onClick={() => handleDismissNotification(notification.id)}
+                >
+                  Dismiss
+                </Button>
+              </Box>
+            }
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      ))} */}
     </Box>
   );
 };

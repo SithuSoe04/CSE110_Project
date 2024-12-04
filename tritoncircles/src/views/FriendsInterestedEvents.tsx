@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography, Avatar, List, ListItem, Divider, TextField } from "@mui/material";
-import { fetchFriendsInterestedEvents } from "../utils/friends-utils"; 
+import { updateFriendsInterestedEvents, fetchFriendsInterestedEvents } from "../utils/friends-utils"; 
 
 interface Event {
   id: number;
   title: string;
   date: string;
-  time: string;
   room: string;
   incentives: string;
   courseCode: string;
@@ -22,20 +21,28 @@ const FriendsInterestedEvents: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      const userId = localStorage.getItem("user_id");
+      if (!userId) {
+        setError("User ID not found. Please log in.");
+        setLoading(false);
+        return;
+      }
+  
       try {
-        const eventsData = await fetchFriendsInterestedEvents();
-        setEvents(eventsData || []); // Fallback to an empty array if undefined or null
+        // Update the friends interested events table before fetching
+        await updateFriendsInterestedEvents(userId);
+        const eventsData = await fetchFriendsInterestedEvents(userId);
+        setEvents(eventsData || []);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching events:", err);
-        setError("Failed to load friends events.");
+        setError("Failed to load friends' events.");
         setLoading(false);
       }
     };
   
     fetchData();
-  }, []);
-  
+  }, []);   
 
   // Filter events based on the search term
   const filteredEvents = events.filter((event) =>
@@ -88,9 +95,11 @@ const FriendsInterestedEvents: React.FC = () => {
               <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                 {event.title}
               </Typography>
+
               <Typography variant="caption" sx={{ display: "block", color: "gray" }}>
-                {event.date} - {event.time}
+                {event.date}
               </Typography>
+
               <Typography variant="caption" sx={{ display: "block", color: "gray" }}>
                 Incentives: {event.incentives}
               </Typography>
