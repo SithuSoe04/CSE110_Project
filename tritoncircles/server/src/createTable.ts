@@ -1,9 +1,9 @@
 import sqlite3 from "sqlite3";
 import { open } from "sqlite";
 
-async function resetAutoIncrement(db: sqlite3.Database, tableName: string) {
-    await db.run(`DELETE FROM sqlite_sequence WHERE name='${tableName}';`);
-  }
+// async function resetAutoIncrement(db: sqlite3.Database, tableName: string) {
+//     await db.run(`DELETE FROM sqlite_sequence WHERE name='${tableName}';`);
+//   }
 
 const initDB = async () => {
   // Open the database connection
