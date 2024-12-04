@@ -1,5 +1,6 @@
 import sqlite3 from "sqlite3";
 import { open } from "sqlite";
+import {eventData, recruitmentData, clubData} from './constants'
 
 async function resetAutoIncrement(db: sqlite3.Database, tableName: string) {
     await db.run(`DELETE FROM sqlite_sequence WHERE name='${tableName}';`);

@@ -46,6 +46,7 @@ const Clubs: React.FC = () => {
       const response = await axios.get<{ clubs: Club[] }>(
         `http://localhost:8080/api/clubs?userId=${userId}`
       );
+      
       console.log("Raw response:", response.data);
 
       if (!response.data || !response.data.clubs) {

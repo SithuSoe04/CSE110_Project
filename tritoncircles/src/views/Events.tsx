@@ -103,10 +103,19 @@ const Events = () => {
   }
 
   return (
+    favoriteEvents.length === 0 && upcomingEvents.length === 0 ? (
+      <Typography variant="h6" align="center" sx={{ marginTop: "2rem", fontWeight: "bold" }}>
+        No events to display. Favorite some clubs to see their events!
+      </Typography>
+    ) : (
     <Box sx={{ flexGrow: 1, margin: "3rem" }}>
       <Box sx={{ display: 'flex', flexDirection:'row', justifyContent:'space-between',  alignContent:'cetner' }}>
         <Typography gutterBottom variant="h4">
           <Box sx={{ fontWeight: "bold" }}>Interested Events</Box>
+          {favoriteEvents.length === 0 && 
+          <Typography variant="body1" color="text.secondary">
+              No favorite events yet. Click the heart icon to add events to your favorites.
+          </Typography>}
         </Typography>
         <FormGroup aria-label="position" row>
           <FormControlLabel
@@ -133,7 +142,7 @@ const Events = () => {
         ))}
       </Grid>
     </Box>
-  );
+  ));
 };
 
 export default Events;

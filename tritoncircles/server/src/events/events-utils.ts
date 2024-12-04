@@ -9,7 +9,7 @@ export async function createEvent(req: Request, res: Response, db: Database) {
     try {
         await db.run('INSERT INTO events (club_id, title, date, room, incentives) VALUES (?, ?, ?, ?, ?);', [club_id, title, date, room, incentives || ""]);
     } catch (error) {
-        return res.status(400).send({ error: `Event could not be created, + ${error}` });
+        return res.status(500).send({ error: `Event could not be created, + ${error}` });
     };
     res.status(201).send({ club_id, title, date, room, incentives });
 }

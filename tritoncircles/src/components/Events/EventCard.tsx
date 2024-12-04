@@ -45,14 +45,25 @@ const formatDate = (dateString: string) => {
   return `${formattedDate}, ${formattedTime}`;
 };
 
+const getBackgroundColor = () => {
+  const colors = ['#FFB6C1', '#ADD8E6', '#98FB98', '#FFFFE0', '#FFD700', '#FF6347'];
+  return colors[Math.floor(Math.random() * colors.length)];
+};
+
 export default function EventCard(event: EventProps) {
   return (
     <Card sx={{ maxWidth: 345, borderRadius: 2 }}>
-      <CardMedia
+      {/* <CardMedia
         sx={{ height: 140 }}
         image="https://www.screenskills.com/media/6780/software_engineer.png?width=560&mode=crop&scale=both&center=0,0"
         title=""
-      />
+      /> */}
+       <Box sx={{
+        height: 140,
+        backgroundColor: getBackgroundColor(),
+        borderTopLeftRadius: 2,
+        borderTopRightRadius: 2
+      }} />
       <CardContent>
         <Typography gutterBottom variant="h6" component="div">
          <b>{event.title}</b>
@@ -65,25 +76,15 @@ export default function EventCard(event: EventProps) {
         </Typography>
       </CardContent>
       <CardActions>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%'}}>
-        <Box sx={{ display: 'flex', justifyContent:'flex-start'}}>
-        <AvatarGroup spacing="medium" total={8} slotProps={{additionalAvatar: { sx: { width: 24, height: 24} }}}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" sx={{ width: 24, height: 24 }}/>
-                <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" sx={{ width: 24, height: 24 }}/>
-                <Avatar alt="Agnes Walker" src="/static/images/avatar/4.jpg" sx={{ width: 24, height: 24 }}/>
-                <Avatar alt="Trevor Henderson" src="/static/images/avatar/5.jpg" sx={{ width: 24, height: 24 }}/>
-            </AvatarGroup>
-        </Box>
-        <Box sx={{ display: 'flex', justifyContent:'flex-end', alignItems:'center', gap: '0.25rem' }}>
+        <Box sx={{ display: 'flex', width: '100%', justifyContent:'flex-end', alignItems:'center', gap: '0.25rem' }}>
             <Chip label={event.club} color="secondary" size="small" />
-            {/* {event.incentives.map(incentive=>(
+            {event.incentives.map(incentive=>(
               <Chip label={incentive} color="primary" size="small" />
-            ))} */}
+            ))}
             <IconButton aria-label="add to favorites" onClick={() => event.toggleFavorite(event.id)}>
             <FavoriteIcon sx={{color: event.favorite ? pink[500] : "action"}}/>
             </IconButton>
         </Box>
-      </Box>
       </CardActions>
     </Card>
   );
