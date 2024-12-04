@@ -179,7 +179,7 @@ const Profile = () => {
         <div className = "profile-container"> 
             <div className = "profile-header">
                 <div className = "profile-avatar">
-                    <img src = {`${profileImage}?${new Date().getTime()}` || defaultImage} alt="Profile" className = "profile-image"/>
+                    <img src = {profileImage || defaultImage} alt="Profile" className = "profile-image"/>
                     <label htmlFor = "profile-image-upload" className = "upload-label">
                         <img src={edit1Icon} alt="Edit Profile Picture" title = "Click to change profile picture." className = "edit-icon" style={{cursor: 'pointer'}}/>
                     </label>
