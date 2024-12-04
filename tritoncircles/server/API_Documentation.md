@@ -848,14 +848,12 @@ Searches for users based on query parameters.
 
 ### Responses
 - 200 OK: A list of users matching the search criteria.
-```json
-[
+```
   {
     "user_id": number,
     "username": string,
     "profile_picture": string
   }
-]
 ```
 - 400 Bad Request: Missing required search parameters.
 ```json
@@ -929,15 +927,13 @@ Fetches the interested events of a user's friends.
 
 ### Responses
 - 200 OK: A list of interested events for the user's friends.
-```json
-[
+```
   {
     "event_id": number,
     "event_name": string,
     "event_date": string,
     "friend_id": number
   }
-]
 ```
 - 404 Not Found: User or friends' events not found.
 ```json
