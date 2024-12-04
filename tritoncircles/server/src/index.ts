@@ -12,6 +12,7 @@ const port = 8080;
 
 app.use(cors());
 app.use(express.json());
+app.unsubscribe('/uploads', express.static('uploads'));
 
 interface FavoriteRequest {
   userId: number;
