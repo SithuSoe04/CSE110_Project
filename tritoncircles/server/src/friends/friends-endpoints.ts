@@ -4,19 +4,7 @@ import { getAllFriendRequests, acceptFriendRequest, declineFriendRequest, search
 
 export function createFriendsEndpoints(app: any, db: Database) {
   app.get("/friends/requests", async (req: Request, res: Response) => {
-    try {
-      const user_id = req.query.user_id as string; 
-      console.log("user_id is", user_id);
-
-      if (!user_id) {
-        return res.status(400).json({ error: "Missing user_id query parameter" });
-      }
-      
-      await getAllFriendRequests(req, res, db, user_id);
-    } catch (err) {
-      console.error("Error fetching friend requests:", err);
-      res.status(500).json({ error: "Internal Server Error" });
-    }
+    getAllFriendRequests(req, res, db, req.query.user_id as string);
   });
 
   app.post("/friends/requests/:id/accept", (req: Request, res: Response) => {
@@ -52,17 +40,6 @@ export function createFriendsEndpoints(app: any, db: Database) {
   });
   
   app.get("/friends/interested-events/:userId", async (req: Request, res: Response) => {
-    const { userId } = req.params;
-  
-    if (!userId) {
-      return res.status(400).json({ error: "Missing userId in request parameters." });
-    }
-  
-    try {
-      await getFriendsInterestedEvents(req, res, db);
-    } catch (err) {
-      console.error("Error fetching friends' interested events:", err);
-      res.status(500).json({ error: "Failed to fetch friends' interested events." });
-    }
+    getFriendsInterestedEvents(req, res, db);
   });   
 }  
